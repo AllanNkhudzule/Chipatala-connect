@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medical History – Chipatala Connect</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">C</div>
+        <div class="brand-text">Chipatala Connect <small>Digital Health Passport</small></div>
+      </div>
+      <span class="sidebar-section-label">Patient Portal</span>
+      <ul class="sidebar-nav">
+        <li>
+          <a href="patient-dashboard.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="patient-retrieve.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Retrieve Records
+          </a>
+        </li>
+        <li>
+          <a href="patient-history.html" class="active">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Medical History
+          </a>
+        </li>
+      </ul>
+      <div class="sidebar-footer">
+        &copy; 2026 Chipatala Connect
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="main-area">
+
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <span class="page-title">Medical History</span>
+        </div>
+        <div class="topbar-right">
+          <div class="topbar-search">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Search history…">
+          </div>
+          <button class="topbar-btn theme-toggle" title="Toggle theme">
+            <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>
+          </button>
+          <button class="topbar-btn" title="Notifications">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </button>
+          <div class="topbar-avatar">TM</div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <main class="content">
+
+        <div class="content-header">
+          <h1>Your Medical History</h1>
+          <p>A complete timeline of your health records across all hospitals you've visited.</p>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <select class="form-control">
+            <option value="">All Hospitals</option>
+            <option>Queen Elizabeth Central Hospital</option>
+            <option>Kamuzu Central Hospital</option>
+            <option>Mzuzu Central Hospital</option>
+            <option>Zomba Central Hospital</option>
+          </select>
+          <select class="form-control">
+            <option value="">All Record Types</option>
+            <option>Diagnosis</option>
+            <option>Prescription</option>
+            <option>Lab Result</option>
+            <option>Consultation</option>
+          </select>
+          <input type="date" class="form-control" style="width:auto" placeholder="From">
+          <input type="date" class="form-control" style="width:auto" placeholder="To">
+          <button class="btn btn-secondary btn-sm">Clear Filters</button>
+        </div>
+
+        <!-- Summary -->
+        <div class="stat-grid" style="margin-bottom:28px">
+          <div class="stat-card">
+            <div class="stat-icon green">🏥</div>
+            <div class="stat-value">4</div>
+            <div class="stat-label">Hospitals Visited</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon blue">📋</div>
+            <div class="stat-value">18</div>
+            <div class="stat-label">Total Records</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon yellow">💊</div>
+            <div class="stat-value">9</div>
+            <div class="stat-label">Prescriptions</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon red">🔬</div>
+            <div class="stat-value">5</div>
+            <div class="stat-label">Lab Results</div>
+          </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="card">
+          <div class="card-header">
+            <h2>Timeline</h2>
+          </div>
+
+          <div class="timeline">
+
+            <!-- Feb 2026 -->
+            <div class="timeline-item">
+              <div class="timeline-date">24 February 2026</div>
+              <div class="timeline-card">
+                <div style="display:flex; justify-content:space-between; align-items:start; flex-wrap:wrap; gap:8px">
+                  <h4>Upper Respiratory Tract Infection</h4>
+                  <span class="badge badge-green">Prescription</span>
+                </div>
+                <p>Diagnosed with URTI. Prescribed Amoxicillin 500mg and Ibuprofen 400mg. Follow-up in 7 days.</p>
+                <div class="timeline-meta">
+                  <span>🏥 Queen Elizabeth Central Hospital</span>
+                  <span>👨‍⚕️ Dr. Grace Banda</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Jan 2026 -->
+            <div class="timeline-item">
+              <div class="timeline-date">15 January 2026</div>
+              <div class="timeline-card">
+                <div style="display:flex; justify-content:space-between; align-items:start; flex-wrap:wrap; gap:8px">
+                  <h4>Full Blood Count</h4>
+                  <span class="badge badge-blue">Lab Result</span>
+                </div>
+                <p>Haemoglobin: 14.2 g/dL, WBC: 6,800/μL, Platelets: 245,000/μL. All values within normal range.</p>
+                <div class="timeline-meta">
+                  <span>🏥 Mzuzu Central Hospital</span>
+                  <span>👨‍⚕️ Dr. Chikondi Mwale</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Jan 2025 -->
+            <div class="timeline-item">
+              <div class="timeline-date">05 January 2025</div>
+              <div class="timeline-card">
+                <div style="display:flex; justify-content:space-between; align-items:start; flex-wrap:wrap; gap:8px">
+                  <h4>Vitamin D Deficiency</h4>
+                  <span class="badge badge-green">Prescription</span>
+                </div>
+                <p>Vitamin D level: 18 ng/mL (low). Started on Vitamin D3 2000 IU daily supplementation.</p>
+                <div class="timeline-meta">
+                  <span>🏥 Kamuzu Central Hospital</span>
+                  <span>👨‍⚕️ Dr. James Phiri</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sep 2024 -->
+            <div class="timeline-item">
+              <div class="timeline-date">20 September 2024</div>
+              <div class="timeline-card">
+                <div style="display:flex; justify-content:space-between; align-items:start; flex-wrap:wrap; gap:8px">
+                  <h4>Routine Checkup</h4>
+                  <span class="badge badge-gray">Consultation</span>
+                </div>
+                <p>Annual physical examination. All vitals normal. BMI 23.4. No new concerns raised.</p>
+                <div class="timeline-meta">
+                  <span>🏥 Queen Elizabeth Central Hospital</span>
+                  <span>👨‍⚕️ Dr. Grace Banda</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mar 2024 -->
+            <div class="timeline-item">
+              <div class="timeline-date">12 March 2024</div>
+              <div class="timeline-card">
+                <div style="display:flex; justify-content:space-between; align-items:start; flex-wrap:wrap; gap:8px">
+                  <h4>Mild Asthma Diagnosis</h4>
+                  <span class="badge badge-red">Diagnosis</span>
+                </div>
+                <p>Pulmonary function test confirmed mild persistent asthma. Prescribed Salbutamol inhaler for as-needed use.</p>
+                <div class="timeline-meta">
+                  <span>🏥 Queen Elizabeth Central Hospital</span>
+                  <span>👨‍⚕️ Dr. Grace Banda</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Nov 2023 -->
+            <div class="timeline-item">
+              <div class="timeline-date">08 November 2023</div>
+              <div class="timeline-card">
+                <div style="display:flex; justify-content:space-between; align-items:start; flex-wrap:wrap; gap:8px">
+                  <h4>Malaria Treatment</h4>
+                  <span class="badge badge-green">Prescription</span>
+                </div>
+                <p>Rapid diagnostic test positive for P. falciparum. Treated with Artemether-Lumefantrine (AL) for 3 days.</p>
+                <div class="timeline-meta">
+                  <span>🏥 Zomba Central Hospital</span>
+                  <span>👨‍⚕️ Dr. Wezi Kamanga</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Jun 2023 -->
+            <div class="timeline-item">
+              <div class="timeline-date">14 June 2023</div>
+              <div class="timeline-card">
+                <div style="display:flex; justify-content:space-between; align-items:start; flex-wrap:wrap; gap:8px">
+                  <h4>Blood Glucose Test</h4>
+                  <span class="badge badge-blue">Lab Result</span>
+                </div>
+                <p>Fasting blood glucose: 5.1 mmol/L (normal). HbA1c: 5.3% (normal). No diabetes indicated.</p>
+                <div class="timeline-meta">
+                  <span>🏥 Kamuzu Central Hospital</span>
+                  <span>👨‍⚕️ Dr. James Phiri</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Access – Chipatala Connect</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">C</div>
+        <div class="brand-text">Chipatala Connect <small>Doctor Portal</small></div>
+      </div>
+      <span class="sidebar-section-label">Navigation</span>
+      <ul class="sidebar-nav">
+        <li>
+          <a href="doctor-dashboard.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="doctor-access.html" class="active">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Patient Access
+          </a>
+        </li>
+        <li>
+          <a href="doctor-create-record.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+            Create Record
+          </a>
+        </li>
+      </ul>
+      <div class="sidebar-footer">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px">
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--color-primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.8rem;flex-shrink:0">GB</div>
+          <div>
+            <div style="font-weight:600;font-size:.82rem;color:var(--color-text)">Dr. Grace Banda</div>
+            <div style="font-size:.72rem;color:var(--color-text-muted)">General Practitioner</div>
+          </div>
+        </div>
+        <div style="font-size:.72rem; color:var(--color-text-muted)">Queen Elizabeth Central Hospital</div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="main-area">
+
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <span class="page-title">Patient Access</span>
+        </div>
+        <div class="topbar-right">
+          <button class="topbar-btn theme-toggle" title="Toggle theme">
+            <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>
+          </button>
+          <button class="topbar-btn" title="Notifications">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </button>
+          <div class="topbar-avatar">GB</div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <main class="content">
+
+        <div class="content-header">
+          <h1>Request Temporary Access</h1>
+          <p>Enter the patient's consent token to view their medical records for this session. Access is time-limited and automatically revoked.</p>
+        </div>
+
+        <!-- Access Request Card -->
+        <div class="card" style="max-width:560px; margin-bottom:24px">
+          <div class="card-header">
+            <h2>Patient Consent Token</h2>
+          </div>
+          <div class="form-group">
+            <label>Enter the token or code provided by the patient</label>
+            <input type="text" class="form-control" placeholder="e.g. PAT-7291-CONSENT-XK" style="font-family:'Courier New',monospace; font-size:1rem; letter-spacing:.08em">
+          </div>
+          <div style="display:flex; gap:12px; align-items:center">
+            <button id="access-request-btn" class="btn btn-primary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Request Access
+            </button>
+            <span style="font-size:.8rem; color:var(--color-text-muted)">Session duration: 30 minutes</span>
+          </div>
+        </div>
+
+        <!-- Session Panel (shown after access) -->
+        <div id="session-panel" style="display:none">
+
+          <!-- Session Timer -->
+          <div class="session-timer">
+            <div>
+              <div style="font-size:.75rem; font-weight:600; color:var(--color-text-muted); margin-bottom:2px">SESSION ACTIVE</div>
+              <div class="timer-value">23:45</div>
+            </div>
+            <div class="timer-bar">
+              <div class="timer-fill" style="width:79%"></div>
+            </div>
+            <button class="btn btn-danger btn-sm">End Session</button>
+          </div>
+
+          <!-- Patient Info -->
+          <div class="patient-info">
+            <div class="patient-avatar">TM</div>
+            <div class="patient-details">
+              <h3>Tamanda Mbewe</h3>
+              <p>National ID: MW-2901-4487-XZ &nbsp;|&nbsp; Female, 28 years &nbsp;|&nbsp; Blood Type: O+</p>
+              <p>Known Allergies: <span class="badge badge-red" style="margin-left:4px">Penicillin</span></p>
+            </div>
+          </div>
+
+          <!-- Tabbed Records View -->
+          <div class="card">
+            <div class="tabs">
+              <button class="tab-btn active" data-tab="tab-diagnoses">Diagnoses</button>
+              <button class="tab-btn" data-tab="tab-prescriptions">Prescriptions</button>
+              <button class="tab-btn" data-tab="tab-labs">Lab Results</button>
+              <button class="tab-btn" data-tab="tab-vitals">Vitals</button>
+            </div>
+
+            <!-- Diagnoses Tab -->
+            <div id="tab-diagnoses" class="tab-panel active">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Diagnosis</th>
+                      <th>Hospital</th>
+                      <th>Doctor</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>24 Feb 2026</td>
+                      <td style="font-weight:600; color:var(--color-text)">Upper Respiratory Tract Infection</td>
+                      <td>Queen Elizabeth Central</td>
+                      <td>Dr. G. Banda</td>
+                      <td><span class="badge badge-yellow">Active</span></td>
+                    </tr>
+                    <tr>
+                      <td>05 Jan 2025</td>
+                      <td style="font-weight:600; color:var(--color-text)">Vitamin D Deficiency</td>
+                      <td>Kamuzu Central</td>
+                      <td>Dr. J. Phiri</td>
+                      <td><span class="badge badge-yellow">Ongoing</span></td>
+                    </tr>
+                    <tr>
+                      <td>12 Mar 2024</td>
+                      <td style="font-weight:600; color:var(--color-text)">Mild Persistent Asthma</td>
+                      <td>Queen Elizabeth Central</td>
+                      <td>Dr. G. Banda</td>
+                      <td><span class="badge badge-green">Managed</span></td>
+                    </tr>
+                    <tr>
+                      <td>08 Nov 2023</td>
+                      <td style="font-weight:600; color:var(--color-text)">Malaria (P. falciparum)</td>
+                      <td>Zomba Central</td>
+                      <td>Dr. W. Kamanga</td>
+                      <td><span class="badge badge-gray">Resolved</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Prescriptions Tab -->
+            <div id="tab-prescriptions" class="tab-panel">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Medication</th>
+                      <th>Dosage</th>
+                      <th>Frequency</th>
+                      <th>Prescribed By</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>24 Feb 2026</td>
+                      <td style="font-weight:600; color:var(--color-text)">Amoxicillin</td>
+                      <td>500mg</td>
+                      <td>3x daily, 7 days</td>
+                      <td>Dr. G. Banda</td>
+                    </tr>
+                    <tr>
+                      <td>24 Feb 2026</td>
+                      <td style="font-weight:600; color:var(--color-text)">Ibuprofen</td>
+                      <td>400mg</td>
+                      <td>As needed</td>
+                      <td>Dr. G. Banda</td>
+                    </tr>
+                    <tr>
+                      <td>05 Jan 2025</td>
+                      <td style="font-weight:600; color:var(--color-text)">Vitamin D3</td>
+                      <td>2000 IU</td>
+                      <td>Once daily</td>
+                      <td>Dr. J. Phiri</td>
+                    </tr>
+                    <tr>
+                      <td>12 Mar 2024</td>
+                      <td style="font-weight:600; color:var(--color-text)">Salbutamol Inhaler</td>
+                      <td>2 puffs</td>
+                      <td>As needed</td>
+                      <td>Dr. G. Banda</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Lab Results Tab -->
+            <div id="tab-labs" class="tab-panel">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Test</th>
+                      <th>Result</th>
+                      <th>Reference Range</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>15 Jan 2026</td>
+                      <td style="font-weight:600; color:var(--color-text)">Haemoglobin</td>
+                      <td>14.2 g/dL</td>
+                      <td>12.0 – 16.0</td>
+                      <td><span class="badge badge-green">Normal</span></td>
+                    </tr>
+                    <tr>
+                      <td>15 Jan 2026</td>
+                      <td style="font-weight:600; color:var(--color-text)">WBC Count</td>
+                      <td>6,800 /μL</td>
+                      <td>4,000 – 11,000</td>
+                      <td><span class="badge badge-green">Normal</span></td>
+                    </tr>
+                    <tr>
+                      <td>15 Jan 2026</td>
+                      <td style="font-weight:600; color:var(--color-text)">Platelets</td>
+                      <td>245,000 /μL</td>
+                      <td>150,000 – 400,000</td>
+                      <td><span class="badge badge-green">Normal</span></td>
+                    </tr>
+                    <tr>
+                      <td>14 Jun 2023</td>
+                      <td style="font-weight:600; color:var(--color-text)">Fasting Blood Glucose</td>
+                      <td>5.1 mmol/L</td>
+                      <td>3.9 – 5.6</td>
+                      <td><span class="badge badge-green">Normal</span></td>
+                    </tr>
+                    <tr>
+                      <td>14 Jun 2023</td>
+                      <td style="font-weight:600; color:var(--color-text)">HbA1c</td>
+                      <td>5.3%</td>
+                      <td>&lt; 5.7%</td>
+                      <td><span class="badge badge-green">Normal</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Vitals Tab -->
+            <div id="tab-vitals" class="tab-panel">
+              <div class="vitals-grid" style="margin-bottom:20px">
+                <div class="vital-card">
+                  <div class="vital-icon">🩸</div>
+                  <div class="vital-value">120/78</div>
+                  <div class="vital-label">Blood Pressure (mmHg)</div>
+                </div>
+                <div class="vital-card">
+                  <div class="vital-icon">❤️</div>
+                  <div class="vital-value">72 bpm</div>
+                  <div class="vital-label">Heart Rate</div>
+                </div>
+                <div class="vital-card">
+                  <div class="vital-icon">🌡️</div>
+                  <div class="vital-value">36.8°C</div>
+                  <div class="vital-label">Temperature</div>
+                </div>
+                <div class="vital-card">
+                  <div class="vital-icon">🅾️</div>
+                  <div class="vital-value">O+</div>
+                  <div class="vital-label">Blood Type</div>
+                </div>
+                <div class="vital-card">
+                  <div class="vital-icon">⚖️</div>
+                  <div class="vital-value">68 kg</div>
+                  <div class="vital-label">Weight</div>
+                </div>
+                <div class="vital-card">
+                  <div class="vital-icon">📏</div>
+                  <div class="vital-value">165 cm</div>
+                  <div class="vital-label">Height</div>
+                </div>
+              </div>
+              <div style="padding:12px 16px; background:var(--color-danger-bg); border:1px solid var(--color-danger); border-radius:var(--radius-sm); display:flex; align-items:center; gap:10px">
+                <span style="font-size:1.1rem">⚠️</span>
+                <div>
+                  <strong style="font-size:.85rem; color:var(--color-danger)">Allergy Alert</strong>
+                  <p style="font-size:.82rem; color:var(--color-text-secondary); margin:0">Patient is allergic to <strong>Penicillin</strong>. Avoid prescribing penicillin-class antibiotics.</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

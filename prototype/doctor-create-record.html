@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Record – Chipatala Connect</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">C</div>
+        <div class="brand-text">Chipatala Connect <small>Doctor Portal</small></div>
+      </div>
+      <span class="sidebar-section-label">Navigation</span>
+      <ul class="sidebar-nav">
+        <li>
+          <a href="doctor-dashboard.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="doctor-access.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Patient Access
+          </a>
+        </li>
+        <li>
+          <a href="doctor-create-record.html" class="active">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+            Create Record
+          </a>
+        </li>
+      </ul>
+      <div class="sidebar-footer">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px">
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--color-primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.8rem;flex-shrink:0">GB</div>
+          <div>
+            <div style="font-weight:600;font-size:.82rem;color:var(--color-text)">Dr. Grace Banda</div>
+            <div style="font-size:.72rem;color:var(--color-text-muted)">General Practitioner</div>
+          </div>
+        </div>
+        <div style="font-size:.72rem; color:var(--color-text-muted)">Queen Elizabeth Central Hospital</div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="main-area">
+
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <span class="page-title">Create Medical Record</span>
+        </div>
+        <div class="topbar-right">
+          <button class="topbar-btn theme-toggle" title="Toggle theme">
+            <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>
+          </button>
+          <button class="topbar-btn" title="Notifications">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </button>
+          <div class="topbar-avatar">GB</div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <main class="content">
+
+        <div class="content-header">
+          <h1>Create New Record</h1>
+          <p>Fill in the medical record details below. The formatted record will be available for the patient to retrieve via QR code or retrieval code.</p>
+        </div>
+
+        <div class="grid-2">
+
+          <!-- Form Column -->
+          <div>
+            <div class="card" style="margin-bottom:20px">
+              <div class="card-header">
+                <h2>Record Details</h2>
+              </div>
+
+              <div class="form-group">
+                <label>Record Type</label>
+                <select class="form-control">
+                  <option value="">Select type…</option>
+                  <option selected>Prescription</option>
+                  <option>Diagnosis</option>
+                  <option>Lab Result</option>
+                  <option>Consultation Note</option>
+                  <option>Referral</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Patient Name</label>
+                <input type="text" class="form-control" value="Tamanda Mbewe">
+              </div>
+
+              <div class="form-group">
+                <label>Patient National ID</label>
+                <input type="text" class="form-control" value="MW-2901-4487-XZ">
+              </div>
+
+              <div class="form-group">
+                <label>Primary Diagnosis / Reason</label>
+                <input type="text" class="form-control" value="Upper Respiratory Tract Infection">
+              </div>
+
+              <div class="form-group">
+                <label>Clinical Notes</label>
+                <textarea class="form-control" rows="3">Patient presents with sore throat, cough, and mild fever for 3 days. No signs of lower respiratory involvement. Advised rest, fluids, and follow-up in 7 days if symptoms persist.</textarea>
+              </div>
+            </div>
+
+            <!-- Prescriptions -->
+            <div class="card" style="margin-bottom:20px">
+              <div class="card-header">
+                <h2>Prescriptions</h2>
+                <button class="btn btn-sm btn-outline">+ Add Medication</button>
+              </div>
+
+              <div class="rx-row">
+                <div class="form-group">
+                  <label>Medication</label>
+                  <input type="text" class="form-control" value="Amoxicillin">
+                </div>
+                <div class="form-group">
+                  <label>Dosage</label>
+                  <input type="text" class="form-control" value="500mg">
+                </div>
+                <div class="form-group">
+                  <label>Frequency</label>
+                  <input type="text" class="form-control" value="3x daily, 7 days">
+                </div>
+                <button class="btn btn-icon btn-secondary" style="margin-bottom:0" title="Remove">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              </div>
+
+              <div class="rx-row">
+                <div class="form-group">
+                  <label>Medication</label>
+                  <input type="text" class="form-control" value="Ibuprofen">
+                </div>
+                <div class="form-group">
+                  <label>Dosage</label>
+                  <input type="text" class="form-control" value="400mg">
+                </div>
+                <div class="form-group">
+                  <label>Frequency</label>
+                  <input type="text" class="form-control" value="As needed for pain">
+                </div>
+                <button class="btn btn-icon btn-secondary" style="margin-bottom:0" title="Remove">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Follow-up -->
+            <div class="card" style="margin-bottom:20px">
+              <div class="card-header">
+                <h2>Follow-up</h2>
+              </div>
+              <div class="form-group">
+                <label>Follow-up Instructions</label>
+                <textarea class="form-control" rows="2">Return in 7 days if symptoms persist. Avoid cold beverages. Ensure adequate hydration.</textarea>
+              </div>
+              <div class="form-group">
+                <label>Follow-up Date</label>
+                <input type="date" class="form-control" value="2026-03-05">
+              </div>
+            </div>
+
+            <div style="display:flex; gap:12px">
+              <button id="generate-qr-btn" class="btn btn-primary btn-lg">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><line x1="14" y1="14" x2="14" y2="17"/><line x1="14" y1="21" x2="14" y2="21"/><line x1="17" y1="14" x2="21" y2="14"/><line x1="17" y1="17" x2="21" y2="17"/><line x1="17" y1="21" x2="21" y2="21"/></svg>
+                Generate QR &amp; Code
+              </button>
+              <button class="btn btn-secondary btn-lg">Save as Draft</button>
+            </div>
+          </div>
+
+          <!-- Preview Column -->
+          <div>
+            <div class="card" style="position:sticky; top:88px">
+              <div class="card-header">
+                <h2>Formatted Record Preview</h2>
+                <span class="badge badge-green">FHIR Format</span>
+              </div>
+
+              <div class="record-preview">
+                <div class="preview-header">
+                  <h3>Medical Report – Prescription</h3>
+                </div>
+                <div class="preview-body">
+                  <div class="preview-row">
+                    <span class="preview-label">Record ID</span>
+                    <span class="preview-value">REC-2026-00412</span>
+                  </div>
+                  <div class="preview-row">
+                    <span class="preview-label">Date</span>
+                    <span class="preview-value">26 February 2026</span>
+                  </div>
+                  <div class="preview-row">
+                    <span class="preview-label">Hospital</span>
+                    <span class="preview-value">Queen Elizabeth Central Hospital, Blantyre</span>
+                  </div>
+                  <div class="preview-row">
+                    <span class="preview-label">Doctor</span>
+                    <span class="preview-value">Dr. Grace Banda – General Practitioner</span>
+                  </div>
+                  <div class="preview-row">
+                    <span class="preview-label">Patient</span>
+                    <span class="preview-value">Tamanda Mbewe (MW-2901-4487-XZ)</span>
+                  </div>
+                  <div class="preview-row">
+                    <span class="preview-label">Diagnosis</span>
+                    <span class="preview-value">Upper Respiratory Tract Infection</span>
+                  </div>
+                  <div class="preview-row">
+                    <span class="preview-label">Clinical Notes</span>
+                    <span class="preview-value">Sore throat, cough, mild fever for 3 days. No lower respiratory involvement.</span>
+                  </div>
+                  <div class="preview-row">
+                    <span class="preview-label">Rx 1</span>
+                    <span class="preview-value">Amoxicillin 500mg – 3x daily for 7 days</span>
+                  </div>
+                  <div class="preview-row">
+                    <span class="preview-label">Rx 2</span>
+                    <span class="preview-value">Ibuprofen 400mg – As needed for pain</span>
+                  </div>
+                  <div class="preview-row">
+                    <span class="preview-label">Follow-up</span>
+                    <span class="preview-value">05 March 2026 – Return if symptoms persist</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- QR & Code Result (hidden by default) -->
+              <div id="qr-result" style="display:none; margin-top:24px">
+                <div class="divider">Transfer to Patient</div>
+
+                <div style="text-align:center">
+                  <div class="qr-placeholder" style="margin-bottom:16px">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                      <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                      <line x1="14" y1="14" x2="14" y2="17"/><line x1="14" y1="21" x2="14" y2="21"/><line x1="17" y1="14" x2="21" y2="14"/>
+                      <line x1="17" y1="17" x2="21" y2="17"/><line x1="17" y1="21" x2="21" y2="21"/>
+                    </svg>
+                    <span>QR Code Generated</span>
+                  </div>
+
+                  <p style="font-size:.82rem; color:var(--color-text-muted); margin-bottom:12px">Or share this retrieval code with the patient:</p>
+
+                  <div style="display:inline-block; padding:14px 28px; background:var(--color-surface-alt); border:2px dashed var(--color-primary-border); border-radius:var(--radius); font-family:'Courier New',monospace; font-size:1.4rem; font-weight:700; color:var(--color-primary); letter-spacing:.2em">
+                    REC-0412-BLZ
+                  </div>
+
+                  <p style="font-size:.75rem; color:var(--color-text-muted); margin-top:12px">Code expires in 48 hours. Patient can enter this code in their app to retrieve the record.</p>
+
+                  <div style="display:flex; gap:10px; justify-content:center; margin-top:16px">
+                    <button class="btn btn-outline btn-sm">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                      Copy Code
+                    </button>
+                    <button class="btn btn-outline btn-sm">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 17h2a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2"/><polyline points="17 9 17 2 7 2 7 9"/><rect x="7" y="13" width="10" height="8" rx="1"/></svg>
+                      Print QR
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

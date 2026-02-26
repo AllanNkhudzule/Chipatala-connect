@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Dashboard – Chipatala Connect</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">C</div>
+        <div class="brand-text">Chipatala Connect <small>Digital Health Passport</small></div>
+      </div>
+      <span class="sidebar-section-label">Patient Portal</span>
+      <ul class="sidebar-nav">
+        <li>
+          <a href="patient-dashboard.html" class="active">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="patient-retrieve.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Retrieve Records
+          </a>
+        </li>
+        <li>
+          <a href="patient-history.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Medical History
+          </a>
+        </li>
+      </ul>
+      <div class="sidebar-footer">
+        &copy; 2026 Chipatala Connect
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="main-area">
+
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <span class="page-title">Dashboard</span>
+        </div>
+        <div class="topbar-right">
+          <div class="topbar-search">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Search records…">
+          </div>
+          <button class="topbar-btn theme-toggle" title="Toggle theme">
+            <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>
+          </button>
+          <button class="topbar-btn" title="Notifications">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span class="badge-dot"></span>
+          </button>
+          <div class="topbar-avatar">TM</div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <main class="content">
+
+        <!-- Welcome Card -->
+        <div class="welcome-card">
+          <div>
+            <h2>Welcome back, Tamanda</h2>
+            <p>National ID: MW-2901-4487-XZ &nbsp;|&nbsp; Your health records are secure and up to date.</p>
+          </div>
+          <div class="welcome-actions">
+            <a href="patient-retrieve.html" class="btn btn-white">Retrieve New Record</a>
+            <button class="btn btn-ghost">Grant Access</button>
+          </div>
+        </div>
+
+        <!-- Current Health Status -->
+        <div class="card" style="margin-bottom:24px">
+          <div class="card-header">
+            <h2>Current Health Status</h2>
+            <span class="badge badge-green">Up to date</span>
+          </div>
+          <div class="vitals-grid">
+            <div class="vital-card">
+              <div class="vital-icon">🩸</div>
+              <div class="vital-value">120/78</div>
+              <div class="vital-label">Blood Pressure (mmHg)</div>
+            </div>
+            <div class="vital-card">
+              <div class="vital-icon">❤️</div>
+              <div class="vital-value">72 bpm</div>
+              <div class="vital-label">Heart Rate</div>
+            </div>
+            <div class="vital-card">
+              <div class="vital-icon">🅾️</div>
+              <div class="vital-value">O+</div>
+              <div class="vital-label">Blood Type</div>
+            </div>
+            <div class="vital-card">
+              <div class="vital-icon">⚖️</div>
+              <div class="vital-value">68 kg</div>
+              <div class="vital-label">Weight</div>
+            </div>
+            <div class="vital-card">
+              <div class="vital-icon">⚠️</div>
+              <div class="vital-value">Penicillin</div>
+              <div class="vital-label">Known Allergy</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Two-column: Conditions + Medications -->
+        <div class="grid-2" style="margin-bottom:24px">
+          <div class="card">
+            <div class="card-header">
+              <h2>Active Conditions</h2>
+            </div>
+            <ul class="activity-list">
+              <li class="activity-item">
+                <div class="activity-icon stat-icon green">🫁</div>
+                <div class="activity-body">
+                  <strong>Mild Asthma</strong>
+                  <p>Diagnosed 12 Mar 2024 – Queen Elizabeth Central Hospital</p>
+                </div>
+                <span class="badge badge-green">Managed</span>
+              </li>
+              <li class="activity-item">
+                <div class="activity-icon stat-icon yellow">🦴</div>
+                <div class="activity-body">
+                  <strong>Vitamin D Deficiency</strong>
+                  <p>Diagnosed 05 Jan 2025 – Kamuzu Central Hospital</p>
+                </div>
+                <span class="badge badge-yellow">Ongoing</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2>Current Medications</h2>
+            </div>
+            <ul class="activity-list">
+              <li class="activity-item">
+                <div class="activity-icon stat-icon blue">💊</div>
+                <div class="activity-body">
+                  <strong>Salbutamol Inhaler</strong>
+                  <p>2 puffs as needed – Prescribed by Dr. Banda</p>
+                </div>
+              </li>
+              <li class="activity-item">
+                <div class="activity-icon stat-icon blue">💊</div>
+                <div class="activity-body">
+                  <strong>Vitamin D3 2000 IU</strong>
+                  <p>Once daily – Prescribed by Dr. Phiri</p>
+                </div>
+              </li>
+              <li class="activity-item">
+                <div class="activity-icon stat-icon blue">💊</div>
+                <div class="activity-body">
+                  <strong>Paracetamol 500mg</strong>
+                  <p>As needed for pain – OTC</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card">
+          <div class="card-header">
+            <h2>Recent Activity</h2>
+            <a href="patient-history.html" class="card-action">View all history →</a>
+          </div>
+          <ul class="activity-list">
+            <li class="activity-item">
+              <div class="activity-icon stat-icon green">📋</div>
+              <div class="activity-body">
+                <strong>New Prescription Added</strong>
+                <p>Vitamin D3 supplement – Kamuzu Central Hospital</p>
+              </div>
+              <span class="activity-time">2 days ago</span>
+            </li>
+            <li class="activity-item">
+              <div class="activity-icon stat-icon blue">🔬</div>
+              <div class="activity-body">
+                <strong>Lab Results Received</strong>
+                <p>Full Blood Count – Mzuzu Central Hospital</p>
+              </div>
+              <span class="activity-time">5 days ago</span>
+            </li>
+            <li class="activity-item">
+              <div class="activity-icon stat-icon yellow">🏥</div>
+              <div class="activity-body">
+                <strong>Hospital Visit</strong>
+                <p>Follow-up consultation – Queen Elizabeth Central Hospital</p>
+              </div>
+              <span class="activity-time">2 weeks ago</span>
+            </li>
+            <li class="activity-item">
+              <div class="activity-icon stat-icon green">🔓</div>
+              <div class="activity-body">
+                <strong>Access Granted</strong>
+                <p>Dr. Mwale viewed records (session expired)</p>
+              </div>
+              <span class="activity-time">2 weeks ago</span>
+            </li>
+          </ul>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
