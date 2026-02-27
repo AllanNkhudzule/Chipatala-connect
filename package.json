@@ -1,0 +1,17 @@
+{
+  "name": "chipatala-connect",
+  "private": true,
+  "scripts": {
+    "dev:patient": "cd patient-app && npm run dev",
+    "dev:doctor": "cd doctor-portal && npm run dev",
+    "dev:relay": "cd relay-server && npm start",
+    "dev": "concurrently \"npm run dev:relay\" \"npm run dev:doctor\" \"npm run dev:patient\"",
+    "build:patient": "cd patient-app && npm run build",
+    "build:doctor": "cd doctor-portal && npm run build",
+    "build": "npm run build:patient && npm run build:doctor",
+    "install:all": "cd relay-server && npm install && cd ../doctor-portal && npm install && cd ../patient-app && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
