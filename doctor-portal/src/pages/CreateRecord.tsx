@@ -58,7 +58,7 @@ export default function CreateRecord() {
   });
 
   const handleGenerate = async () => {
-    if (!patientName.trim() || !diagnosis.trim()) return;
+    if (!diagnosis.trim()) return;
     setPublishing(true);
     setRetrievalCode('');
     const record = buildRecord();

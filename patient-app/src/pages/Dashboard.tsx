@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { patientProfile, recentActivity } from '../data/mockData';
 import { grantAccess } from '../services/relay';
+import { QRCodeSVG } from 'qrcode.react';
 
 const statusBadge: Record<string, string> = {
   managed: 'badge badge-green',
@@ -177,13 +178,16 @@ export default function Dashboard() {
                 <p style={{ color: 'var(--color-text-secondary)', fontSize: '.85rem', marginBottom: 16 }}>
                   Share this token with your doctor. It expires in 30 minutes.
                 </p>
+                <div style={{ marginBottom: 20 }}>
+                  <QRCodeSVG value={consentToken} size={220} level="H" />
+                </div>
                 <div
                   style={{
                     background: 'var(--color-surface-alt)',
                     borderRadius: 'var(--radius)',
-                    padding: '20px',
+                    padding: '12px 20px',
                     fontFamily: "'Courier New', monospace",
-                    fontSize: '1.6rem',
+                    fontSize: '1.2rem',
                     fontWeight: 700,
                     letterSpacing: '.12em',
                     color: 'var(--color-primary)',

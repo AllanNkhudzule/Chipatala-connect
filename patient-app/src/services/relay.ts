@@ -1,7 +1,7 @@
 import { RELAY_URL } from '../data/mockData';
 import type { MedicalRecord, AccessGrant } from '../types';
 import { patientProfile, medicalTimeline, initialRecords } from '../data/mockData';
-import { getRecords } from './storage';
+import { getRecords, saveRecord, getTheme, setTheme, getProfile, saveProfile } from './storage';
 
 export async function retrieveRecord(code: string): Promise<MedicalRecord | null> {
   try {
@@ -15,9 +15,9 @@ export async function retrieveRecord(code: string): Promise<MedicalRecord | null
 
 export async function grantAccess(durationMinutes: number = 30): Promise<string | null> {
   try {
-    const allRecords = [...initialRecords, ...getRecords()];
+    const [allRecords, patient] = await Promise.all([getRecords(), getProfile()]);
     const payload: Omit<AccessGrant, 'token'> = {
-      patient: patientProfile,
+      patient: patient || patientProfile,
       records: allRecords,
       timeline: medicalTimeline,
       grantedAt: new Date().toISOString(),

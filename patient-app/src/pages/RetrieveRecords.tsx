@@ -3,16 +3,17 @@ import { QRCodeSVG } from 'qrcode.react';
 import type { MedicalRecord } from '../types';
 import { retrieveRecord } from '../services/relay';
 import { saveRecord } from '../services/storage';
+import QrScanner from '../components/QrScanner';
 
-type Status = 'idle' | 'loading' | 'preview' | 'error' | 'saved';
+type Status = 'idle' | 'loading' | 'preview' | 'error' | 'saved' | 'scanning';
 
 export default function RetrieveRecords() {
   const [code, setCode] = useState('');
   const [status, setStatus] = useState<Status>('idle');
   const [record, setRecord] = useState<MedicalRecord | null>(null);
 
-  async function handleRetrieve() {
-    const trimmed = code.trim();
+  async function handleRetrieve(retrievalCode?: string) {
+    const trimmed = (retrievalCode || code).trim();
     if (!trimmed) return;
     setStatus('loading');
     const result = await retrieveRecord(trimmed);
@@ -42,6 +43,31 @@ export default function RetrieveRecords() {
     setRecord(null);
     setCode('');
     setStatus('idle');
+  }
+
+  const handleQrScan = (result: string) => {
+    setCode(result);
+    setStatus('loading');
+    handleRetrieve(result);
+  };
+
+  if (status === 'scanning') {
+    return (
+      <div className="card center-card">
+        <div className="content-header" style={{ textAlign: 'center', marginBottom: 20 }}>
+          <h1>Scan Medical Record QR</h1>
+          <p>Point your camera at the QR code provided by the doctor.</p>
+        </div>
+        <QrScanner onResult={handleQrScan} />
+        <button
+          className="btn btn-secondary"
+          onClick={() => setStatus('idle')}
+          style={{ marginTop: 16 }}
+        >
+          Cancel
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -93,7 +119,7 @@ export default function RetrieveRecords() {
 
           <div className="divider">or</div>
 
-          <div className="qr-placeholder" style={{ cursor: 'pointer' }}>
+          <div className="qr-placeholder" style={{ cursor: 'pointer' }} onClick={() => setStatus('scanning')}>
             <svg
               viewBox="0 0 24 24"
               fill="none"

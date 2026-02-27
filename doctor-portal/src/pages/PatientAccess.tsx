@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Lock, AlertTriangle } from 'lucide-react';
 import type { AccessGrant } from '../types';
 import { requestAccess } from '../services/relay';
+import QrScanner from '../components/QrScanner';
 
 type Tab = 'diagnoses' | 'prescriptions' | 'lab' | 'vitals';
 
@@ -29,12 +30,14 @@ export default function PatientAccess() {
   const [grant, setGrant] = useState<AccessGrant | null>(null);
   const [remaining, setRemaining] = useState(0);
   const [activeTab, setActiveTab] = useState<Tab>('diagnoses');
+  const [showScanner, setShowScanner] = useState(false);
 
   const endSession = useCallback(() => {
     setGrant(null);
     setRemaining(0);
     setToken('');
     setError('');
+    setShowScanner(false);
   }, []);
 
   useEffect(() => {
@@ -52,11 +55,12 @@ export default function PatientAccess() {
     return () => clearInterval(interval);
   }, [grant, endSession]);
 
-  const handleRequest = async () => {
-    if (!token.trim()) return;
+  const handleRequest = async (consentToken?: string) => {
+    const tokenToUse = consentToken || token;
+    if (!tokenToUse.trim()) return;
     setLoading(true);
     setError('');
-    const data = await requestAccess(token.trim());
+    const data = await requestAccess(tokenToUse.trim());
     setLoading(false);
     if (!data) {
       setError('Invalid or expired consent token. Please check and try again.');
@@ -65,6 +69,12 @@ export default function PatientAccess() {
     setGrant(data);
     setRemaining(data.expiresIn);
     setActiveTab('diagnoses');
+    setShowScanner(false);
+  };
+
+  const handleQrScan = (result: string) => {
+    setToken(result);
+    handleRequest(result);
   };
 
   const formatTime = (secs: number) => {
@@ -83,47 +93,60 @@ export default function PatientAccess() {
           <p>Enter a patient consent token to access their medical records</p>
         </div>
 
-        <div className="card center-card" style={{ paddingTop: 40, paddingBottom: 40 }}>
-          <div style={{ marginBottom: 24 }}>
-            <Lock size={48} color="var(--color-primary)" style={{ margin: '0 auto 16px' }} />
-            <h2 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: 8 }}>
-              Patient Consent Token
-            </h2>
-            <p style={{ color: 'var(--color-text-secondary)', fontSize: '.88rem' }}>
-              Ask the patient to share their consent token from the Chipatala app
+        {showScanner ? (
+          <div className="card center-card">
+            <QrScanner onResult={handleQrScan} />
+            <button className="btn btn-secondary" onClick={() => setShowScanner(false)} style={{ marginTop: 16 }}>
+              Cancel
+            </button>
+          </div>
+        ) : (
+          <div className="card center-card" style={{ paddingTop: 40, paddingBottom: 40 }}>
+            <div style={{ marginBottom: 24 }}>
+              <Lock size={48} color="var(--color-primary)" style={{ margin: '0 auto 16px' }} />
+              <h2 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: 8 }}>
+                Patient Consent Token
+              </h2>
+              <p style={{ color: 'var(--color-text-secondary)', fontSize: '.88rem' }}>
+                Ask the patient to share their consent token from the Chipatala app
+              </p>
+            </div>
+
+            <div className="code-input-wrap">
+              <input
+                className="code-input"
+                type="text"
+                placeholder="PAT-7291-CONSENT-XK"
+                value={token}
+                onChange={(e) => setToken(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleRequest()}
+              />
+            </div>
+
+            {error && (
+              <p style={{ color: 'var(--color-danger)', fontSize: '.88rem', marginTop: 16 }}>
+                {error}
+              </p>
+            )}
+
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 24 }}>
+              <button
+                className="btn btn-primary"
+                onClick={() => handleRequest()}
+                disabled={loading || !token.trim()}
+              >
+                {loading ? 'Requesting...' : 'Request Access'}
+              </button>
+              <button className="btn btn-outline" onClick={() => setShowScanner(true)}>
+                Scan QR
+              </button>
+            </div>
+
+            <p style={{ color: 'var(--color-text-muted)', fontSize: '.82rem', marginTop: 16 }}>
+              Session duration: 30 minutes &bull; Read-only access to patient records
             </p>
           </div>
-
-          <div className="code-input-wrap">
-            <input
-              className="code-input"
-              type="text"
-              placeholder="PAT-7291-CONSENT-XK"
-              value={token}
-              onChange={(e) => setToken(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleRequest()}
-            />
-          </div>
-
-          {error && (
-            <p style={{ color: 'var(--color-danger)', fontSize: '.88rem', marginTop: 16 }}>
-              {error}
-            </p>
-          )}
-
-          <button
-            className="btn btn-primary btn-lg"
-            style={{ marginTop: 24 }}
-            onClick={handleRequest}
-            disabled={loading || !token.trim()}
-          >
-            {loading ? 'Requesting...' : 'Request Access'}
-          </button>
-
-          <p style={{ color: 'var(--color-text-muted)', fontSize: '.82rem', marginTop: 16 }}>
-            Session duration: 30 minutes &bull; Read-only access to patient records
-          </p>
-        </div>
+        )}
       </>
     );
   }

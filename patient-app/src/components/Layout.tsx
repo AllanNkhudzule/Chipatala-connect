@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutGrid,
   Download,
@@ -10,6 +10,8 @@ import {
   Bell,
   Menu,
   X,
+  User,
+  LogOut,
 } from 'lucide-react';
 import { getTheme, setTheme } from '../services/storage';
 import { patientProfile } from '../data/mockData';
@@ -30,16 +32,25 @@ export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [dark, setDark] = useState(() => getTheme() === 'dark');
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setSidebarOpen(false);
   }, [location.pathname]);
 
-  function toggleTheme() {
-    const next = dark ? 'light' : 'dark';
+  const toggleTheme = () => {
+    const newTheme = dark ? 'light' : 'dark';
     setDark(!dark);
-    setTheme(next);
-  }
+    setTheme(newTheme);
+  };
+
+  const [theme, setThemeState] = useState(getTheme());
+
+  const toggleThemeState = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    setThemeState(newTheme);
+  };
 
   const pageTitle = pageTitles[location.pathname] || 'Dashboard';
 
@@ -91,38 +102,22 @@ export default function Layout() {
 
       {/* Main area */}
       <div className="main-area">
-        <header className="topbar">
-          <div className="topbar-left">
-            <button
-              className="mobile-menu-btn"
-              onClick={() => setSidebarOpen(true)}
-              aria-label="Open menu"
-            >
-              <Menu size={18} />
+        <header className="header">
+          <div className="logo">Chipatala</div>
+          <div className="header-actions">
+            <button className="btn btn-icon" onClick={toggleTheme}>
+              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
             </button>
-            <h1 className="page-title">{pageTitle}</h1>
-          </div>
-
-          <div className="topbar-right">
-            <div className="topbar-search">
-              <Search size={16} className="search-icon" />
-              <input type="text" placeholder="Search records…" />
-            </div>
-
-            <button className="topbar-btn" onClick={toggleTheme} aria-label="Toggle theme">
-              {dark ? <Sun size={18} /> : <Moon size={18} />}
+            <button className="btn btn-icon" onClick={() => navigate('/profile')}>
+              <User size={20} />
             </button>
-
-            <button className="topbar-btn" aria-label="Notifications">
-              <Bell size={18} />
-              <span className="badge-dot" />
+            <button className="btn btn-icon">
+              <LogOut size={20} />
             </button>
-
-            <div className="topbar-avatar">{patientProfile.initials}</div>
           </div>
         </header>
 
-        <main className="content">
+        <main className="main-content">
           <Outlet />
         </main>
       </div>

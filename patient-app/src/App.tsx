@@ -3,6 +3,7 @@ import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import RetrieveRecords from './pages/RetrieveRecords';
 import MedicalHistory from './pages/MedicalHistory';
+import Profile from './pages/Profile';
 
 export default function App() {
   return (
@@ -11,6 +12,7 @@ export default function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/retrieve" element={<RetrieveRecords />} />
         <Route path="/history" element={<MedicalHistory />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
