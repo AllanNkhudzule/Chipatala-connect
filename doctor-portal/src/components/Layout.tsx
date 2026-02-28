@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { doctorProfile } from '../data/mockData';
 import { getTheme, setTheme } from '../services/storage';
+import NotificationPanel from './NotificationPanel';
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: LayoutGrid },
@@ -110,10 +111,7 @@ export default function Layout() {
             <button className="topbar-btn" onClick={toggleTheme} title="Toggle theme">
               {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
             </button>
-            <button className="topbar-btn" title="Notifications">
-              <Bell size={18} />
-              <span className="badge-dot" />
-            </button>
+            <NotificationPanel />
             <div className="topbar-avatar">{doctorProfile.initials}</div>
           </div>
         </header>

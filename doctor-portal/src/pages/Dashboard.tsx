@@ -1,11 +1,31 @@
 import { useNavigate } from 'react-router-dom';
-import { Lock, FilePlus } from 'lucide-react';
+import {
+  Lock,
+  FilePlus,
+  Users,
+  Unlock,
+  ClipboardList,
+  CheckCircle2,
+  FlaskConical,
+} from 'lucide-react';
 import {
   doctorProfile,
   dashboardStats,
   activeSessions,
   recentRecords,
 } from '../data/mockData';
+
+const statIconMap: Record<string, React.ReactNode> = {
+  users: <Users size={20} strokeWidth={1.75} aria-hidden="true" />,
+  unlock: <Unlock size={20} strokeWidth={1.75} aria-hidden="true" />,
+  clipboard: <ClipboardList size={20} strokeWidth={1.75} aria-hidden="true" />,
+  check: <CheckCircle2 size={20} strokeWidth={1.75} aria-hidden="true" />,
+};
+
+const activityIconMap: Record<string, React.ReactNode> = {
+  clipboard: <ClipboardList size={16} strokeWidth={1.75} aria-hidden="true" />,
+  flask: <FlaskConical size={16} strokeWidth={1.75} aria-hidden="true" />,
+};
 
 const statusBadge: Record<string, string> = {
   active: 'badge badge-green',
@@ -43,10 +63,10 @@ export default function Dashboard() {
         </div>
         <div className="welcome-actions">
           <button className="btn btn-white" onClick={() => navigate('/patient-access')}>
-            <Lock size={16} /> Request Patient Access
+            <Lock size={16} strokeWidth={1.75} aria-hidden="true" /> Request Patient Access
           </button>
           <button className="btn btn-ghost" onClick={() => navigate('/create-record')}>
-            <FilePlus size={16} /> Create New Record
+            <FilePlus size={16} strokeWidth={1.75} aria-hidden="true" /> Create New Record
           </button>
         </div>
       </div>
@@ -54,7 +74,9 @@ export default function Dashboard() {
       <div className="stat-grid">
         {dashboardStats.map((stat) => (
           <div className="stat-card" key={stat.label}>
-            <div className={`stat-icon ${stat.color}`}>{stat.icon}</div>
+            <div className={`stat-icon ${stat.color}`}>
+              {statIconMap[stat.icon] || null}
+            </div>
             <div className="stat-value">{stat.value}</div>
             <div className="stat-label">{stat.label}</div>
           </div>
@@ -87,18 +109,16 @@ export default function Dashboard() {
                     </td>
                     <td>{s.accessType}</td>
                     <td>
-                      <span
-                        style={{
-                          fontWeight: 600,
-                          fontVariantNumeric: 'tabular-nums',
-                          color:
-                            s.status === 'active'
-                              ? 'var(--color-primary)'
-                              : s.status === 'expiring'
-                                ? 'var(--color-warning)'
-                                : 'var(--color-text-muted)',
-                        }}
-                      >
+                      <span style={{
+                        fontWeight: 600,
+                        fontVariantNumeric: 'tabular-nums',
+                        color:
+                          s.status === 'active'
+                            ? 'var(--color-primary)'
+                            : s.status === 'expiring'
+                              ? 'var(--color-warning)'
+                              : 'var(--color-text-muted)',
+                      }}>
                         {s.timeRemaining}
                       </span>
                     </td>
@@ -135,7 +155,7 @@ export default function Dashboard() {
                           : 'var(--color-warning-bg)',
                   }}
                 >
-                  {r.icon}
+                  {activityIconMap[r.icon] || null}
                 </div>
                 <div className="activity-body">
                   <strong>{r.title}</strong>

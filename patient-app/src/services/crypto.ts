@@ -43,16 +43,27 @@ export async function encryptObject(obj: unknown) {
   return JSON.stringify({ iv: bufToBase64(iv.buffer), ct: bufToBase64(ct) });
 }
 
+export class DecryptionError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'DECRYPTION_FAILED';
+  }
+}
+
 export async function decryptToObject(payload: string) {
   try {
-    const { iv: ivB64, ct: ctB64 } = JSON.parse(payload) as { iv: string; ct: string };
-    const iv = new Uint8Array(base64ToBuf(ivB64));
-    const ct = base64ToBuf(ctB64);
+    const parsed = JSON.parse(payload) as { iv?: string; ct?: string };
+    if (!parsed.iv || !parsed.ct) {
+      throw new DecryptionError('Missing IV or ciphertext');
+    }
+    const iv = new Uint8Array(base64ToBuf(parsed.iv));
+    const ct = base64ToBuf(parsed.ct);
     const key = await getDeviceKey();
     const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ct);
     return JSON.parse(new TextDecoder().decode(plain));
-  } catch {
-    return null;
+  } catch (err) {
+    if (err instanceof DecryptionError) throw err;
+    throw new DecryptionError('Decryption processing failed');
   }
 }
 

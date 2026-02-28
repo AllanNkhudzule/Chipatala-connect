@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { QRCodeSVG } from 'qrcode.react';
 import type { MedicalRecord } from '../types';
 import { retrieveRecord } from '../services/relay';
 import { saveRecord } from '../services/storage';
 import QrScanner from '../components/QrScanner';
+import { ClipboardList, CheckCircle2 } from 'lucide-react';
 
 type Status = 'idle' | 'loading' | 'preview' | 'error' | 'saved' | 'scanning';
 
@@ -96,7 +96,7 @@ export default function RetrieveRecords() {
             <button
               className="btn btn-primary btn-lg"
               style={{ width: '100%', justifyContent: 'center' }}
-              onClick={handleRetrieve}
+              onClick={() => handleRetrieve()}
               disabled={!code.trim() || status === 'loading'}
             >
               {status === 'loading' ? 'Retrieving…' : 'Retrieve Record'}
@@ -138,92 +138,102 @@ export default function RetrieveRecords() {
             </svg>
             <span>Tap to scan QR code</span>
           </div>
-        </div>
-      )}
+        </div >
+      )
+      }
 
       {/* Loading spinner */}
-      {status === 'loading' && (
-        <div style={{ textAlign: 'center', marginTop: 24 }}>
-          <div className="loading-spinner" />
-        </div>
-      )}
+      {
+        status === 'loading' && (
+          <div style={{ textAlign: 'center', marginTop: 24 }}>
+            <div className="loading-spinner" />
+          </div>
+        )
+      }
 
       {/* Record preview */}
-      {status === 'preview' && record && (
-        <div className="center-card" style={{ marginTop: 24 }}>
-          <div className="record-preview">
-            <div className="preview-header">
-              <h3>📋 Medical Record — {record.id}</h3>
-            </div>
-            <div className="preview-body">
-              <div className="preview-row">
-                <span className="preview-label">Hospital</span>
-                <span className="preview-value">{record.hospital}</span>
+      {
+        status === 'preview' && record && (
+          <div className="center-card" style={{ marginTop: 24 }}>
+            <div className="record-preview">
+              <div className="preview-header">
+                <h3 style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <ClipboardList size={18} strokeWidth={1.75} aria-hidden="true" />
+                  Medical Record — {record.id}
+                </h3>
               </div>
-              <div className="preview-row">
-                <span className="preview-label">Doctor</span>
-                <span className="preview-value">{record.doctor}</span>
-              </div>
-              <div className="preview-row">
-                <span className="preview-label">Date</span>
-                <span className="preview-value">{record.date}</span>
-              </div>
-              <div className="preview-row">
-                <span className="preview-label">Diagnosis</span>
-                <span className="preview-value">{record.diagnosis}</span>
-              </div>
-              <div className="preview-row">
-                <span className="preview-label">Notes</span>
-                <span className="preview-value">{record.clinicalNotes}</span>
-              </div>
-              {record.prescriptions.length > 0 && (
+              <div className="preview-body">
                 <div className="preview-row">
-                  <span className="preview-label">Prescriptions</span>
-                  <span className="preview-value">
-                    {record.prescriptions.map((rx) => (
-                      <div key={rx.medication}>
-                        {rx.medication} {rx.dosage} — {rx.frequency}
-                      </div>
-                    ))}
-                  </span>
+                  <span className="preview-label">Hospital</span>
+                  <span className="preview-value">{record.hospital}</span>
                 </div>
-              )}
-              <div className="preview-row">
-                <span className="preview-label">Follow-up</span>
-                <span className="preview-value">{record.followUp}</span>
+                <div className="preview-row">
+                  <span className="preview-label">Doctor</span>
+                  <span className="preview-value">{record.doctor}</span>
+                </div>
+                <div className="preview-row">
+                  <span className="preview-label">Date</span>
+                  <span className="preview-value">{record.date}</span>
+                </div>
+                <div className="preview-row">
+                  <span className="preview-label">Diagnosis</span>
+                  <span className="preview-value">{record.diagnosis}</span>
+                </div>
+                <div className="preview-row">
+                  <span className="preview-label">Notes</span>
+                  <span className="preview-value">{record.clinicalNotes}</span>
+                </div>
+                {record.prescriptions.length > 0 && (
+                  <div className="preview-row">
+                    <span className="preview-label">Prescriptions</span>
+                    <span className="preview-value">
+                      {record.prescriptions.map((rx) => (
+                        <div key={rx.medication}>
+                          {rx.medication} {rx.dosage} — {rx.frequency}
+                        </div>
+                      ))}
+                    </span>
+                  </div>
+                )}
+                <div className="preview-row">
+                  <span className="preview-label">Follow-up</span>
+                  <span className="preview-value">{record.followUp}</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 20 }}>
-            <button className="btn btn-primary" onClick={handleAccept}>
-              Accept &amp; Save
-            </button>
-            <button className="btn btn-danger" onClick={handleDecline}>
-              Decline
-            </button>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 20 }}>
+              <button className="btn btn-primary" onClick={handleAccept}>
+                Accept &amp; Save
+              </button>
+              <button className="btn btn-danger" onClick={handleDecline}>
+                Decline
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       {/* Saved confirmation */}
-      {status === 'saved' && record && (
-        <div className="center-card success-animation" style={{ marginTop: 24, textAlign: 'center' }}>
-          <div className="card" style={{ padding: 32 }}>
-            <div style={{ fontSize: '3rem', marginBottom: 12 }}>✅</div>
-            <h3 style={{ fontSize: '1.1rem', marginBottom: 8 }}>Record Saved Successfully</h3>
-            <p style={{ color: 'var(--color-text-secondary)', fontSize: '.88rem', marginBottom: 4 }}>
-              <strong>{record.id}</strong> — {record.diagnosis}
-            </p>
-            <p style={{ color: 'var(--color-text-muted)', fontSize: '.82rem', marginBottom: 20 }}>
-              {record.hospital} &middot; {record.date}
-            </p>
-            <button className="btn btn-primary" onClick={handleReset}>
-              Retrieve Another Record
-            </button>
+      {
+        status === 'saved' && record && (
+          <div className="center-card success-animation" style={{ marginTop: 24, textAlign: 'center' }}>
+            <div className="card" style={{ padding: 32 }}>
+              <CheckCircle2 size={48} strokeWidth={1.25} style={{ color: 'var(--color-success, #16a34a)', marginBottom: 12 }} aria-hidden="true" />
+              <h3 style={{ fontSize: '1.1rem', marginBottom: 8 }}>Record Saved Successfully</h3>
+              <p style={{ color: 'var(--color-text-secondary)', fontSize: '.88rem', marginBottom: 4 }}>
+                <strong>{record.id}</strong> — {record.diagnosis}
+              </p>
+              <p style={{ color: 'var(--color-text-muted)', fontSize: '.82rem', marginBottom: 20 }}>
+                {record.hospital} &middot; {record.date}
+              </p>
+              <button className="btn btn-primary" onClick={handleReset}>
+                Retrieve Another Record
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
     </>
   );
 }

@@ -11,15 +11,15 @@ export const patientProfile: PatientProfile = {
   bloodType: 'O+',
   allergies: ['Penicillin'],
   vitals: [
-    { icon: '🩸', value: '120/78', label: 'Blood Pressure (mmHg)' },
-    { icon: '❤️', value: '72 bpm', label: 'Heart Rate' },
-    { icon: '🅾️', value: 'O+', label: 'Blood Type' },
-    { icon: '⚖️', value: '68 kg', label: 'Weight' },
-    { icon: '⚠️', value: 'Penicillin', label: 'Known Allergy' },
+    { icon: 'droplets', value: '120/78', label: 'Blood Pressure (mmHg)' },
+    { icon: 'heart', value: '72 bpm', label: 'Heart Rate' },
+    { icon: 'activity', value: 'O+', label: 'Blood Type' },
+    { icon: 'weight', value: '68 kg', label: 'Weight' },
+    { icon: 'alert', value: 'Penicillin', label: 'Known Allergy' },
   ],
   conditions: [
-    { name: 'Mild Asthma', date: '12 Mar 2024', hospital: 'Queen Elizabeth Central Hospital', status: 'managed', icon: '🫁' },
-    { name: 'Vitamin D Deficiency', date: '05 Jan 2025', hospital: 'Kamuzu Central Hospital', status: 'ongoing', icon: '🦴' },
+    { name: 'Mild Asthma', date: '12 Mar 2024', hospital: 'Queen Elizabeth Central Hospital', status: 'managed', icon: 'lungs' },
+    { name: 'Vitamin D Deficiency', date: '05 Jan 2025', hospital: 'Kamuzu Central Hospital', status: 'ongoing', icon: 'pill' },
   ],
   medications: [
     { name: 'Salbutamol Inhaler', dosage: '2 puffs as needed', prescribedBy: 'Dr. Banda' },
@@ -36,10 +36,10 @@ export const patientProfile: PatientProfile = {
 };
 
 export const recentActivity: ActivityItem[] = [
-  { icon: '📋', iconColor: 'green', title: 'New Prescription Added', description: 'Vitamin D3 supplement – Kamuzu Central Hospital', time: '2 days ago' },
-  { icon: '🔬', iconColor: 'blue', title: 'Lab Results Received', description: 'Full Blood Count – Mzuzu Central Hospital', time: '5 days ago' },
-  { icon: '🏥', iconColor: 'yellow', title: 'Hospital Visit', description: 'Follow-up consultation – Queen Elizabeth Central Hospital', time: '2 weeks ago' },
-  { icon: '🔓', iconColor: 'green', title: 'Access Granted', description: 'Dr. Mwale viewed records (session expired)', time: '2 weeks ago' },
+  { icon: 'clipboard', iconColor: 'green', title: 'New Prescription Added', description: 'Vitamin D3 supplement – Kamuzu Central Hospital', time: '2 days ago' },
+  { icon: 'flask', iconColor: 'blue', title: 'Lab Results Received', description: 'Full Blood Count – Mzuzu Central Hospital', time: '5 days ago' },
+  { icon: 'hospital', iconColor: 'yellow', title: 'Hospital Visit', description: 'Follow-up consultation – Queen Elizabeth Central Hospital', time: '2 weeks ago' },
+  { icon: 'shield', iconColor: 'green', title: 'Access Granted', description: 'Dr. Mwale viewed records (session expired)', time: '2 weeks ago' },
 ];
 
 export const medicalTimeline: TimelineEntry[] = [

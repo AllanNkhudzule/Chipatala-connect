@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  jti       String   @unique
+  data      String   // Storing patient data payload as JSON string
+  status    String   @default("ACTIVE") // ACTIVE, EXPIRED, CLOSED
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RevokedToken {
+  jti       String   @id
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model RelayBundle {
+  code      String   @id // e.g., REC-XXXX-XXX
+  data      String   // Storing record payload as JSON string
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
