@@ -11,11 +11,25 @@ const JWT_SECRET = process.env.JWT_SECRET || 'chipatala-secret-key';
 
 app.use(cors());
 app.use(express.json({ limit: '5mb' }));
-app.use(express.static('public'));
+
 
 const records = new Map();
 const accessGrants = new Map();
-const reports = [];
+const fs = require('fs');
+const path = require('path');
+const reportsFile = path.join(__dirname, 'reports.json');
+
+// Initialize reports file if it doesn't exist
+if (!fs.existsSync(reportsFile)) {
+  fs.writeFileSync(reportsFile, JSON.stringify([]), 'utf8');
+}
+
+let reports = [];
+try {
+  reports = JSON.parse(fs.readFileSync(reportsFile, 'utf8'));
+} catch (e) {
+  console.error('Failed to read reports.json', e);
+}
 
 function generateCode(prefix) {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -176,11 +190,20 @@ cron.schedule('* * * * *', async () => {
 });
 
 app.post('/api/reports', (req, res) => {
-  reports.push({
+  const newReport = {
     id: generateCode('REP'),
     ...req.body,
     receivedAt: Date.now()
-  });
+  };
+  reports.push(newReport);
+
+  // Save to file
+  try {
+    fs.writeFileSync(reportsFile, JSON.stringify(reports, null, 2), 'utf8');
+  } catch (e) {
+    console.error('Failed to write to reports.json', e);
+  }
+
   console.log(`[Telemetry] Received new ${req.body.type} report (${req.body.severity})`);
   res.json({ ok: true });
 });

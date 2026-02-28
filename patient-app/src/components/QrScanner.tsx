@@ -37,52 +37,55 @@ export default function QrScanner({ onResult }: QrScannerProps) {
   };
 
   useEffect(() => {
-    const scanner = new Html5Qrcode(QR_SCANNER_ID);
-    scannerRef.current = scanner;
+    const timer = setTimeout(() => {
+      const scanner = new Html5Qrcode(QR_SCANNER_ID);
+      scannerRef.current = scanner;
 
-    const config = {
-      fps: 10,
-      qrbox: { width: 250, height: 250 },
-      rememberLastUsedCamera: true,
-    };
+      const config = {
+        fps: 10,
+        qrbox: { width: 250, height: 250 },
+        rememberLastUsedCamera: true,
+      };
 
-    let resultHandled = false;
+      let resultHandled = false;
 
-    function handleSuccess(decodedText: string) {
-      if (resultHandled) return;
-      resultHandled = true;
-      stopStreamAndScanner().then(() => {
-        toast.success('Camera closed.');
-        onResult(decodedText);
-      });
-    }
-
-    function captureStream() {
-      const video = document.querySelector(`#${QR_SCANNER_ID} video`) as HTMLVideoElement;
-      if (video && video.srcObject) {
-        streamRef.current = video.srcObject as MediaStream;
+      function handleSuccess(decodedText: string) {
+        if (resultHandled) return;
+        resultHandled = true;
+        stopStreamAndScanner().then(() => {
+          toast.success('Camera closed.');
+          onResult(decodedText);
+        });
       }
-    }
 
-    scanner.start({ facingMode: 'environment' }, config, handleSuccess, () => { })
-      .then(captureStream)
-      .catch((err: any) => {
-        // Fallback for devices without environment camera
-        scanner.start({ facingMode: 'user' }, config, handleSuccess, () => { })
-          .then(captureStream)
-          .catch((err2: any) => {
-            const errMsg = err2?.name || err2?.message || String(err2);
-            if (errMsg.includes('NotAllowedError') || errMsg.includes('Permission')) {
-              setErrorState('Permission to access camera was denied. Please allow camera access in your browser settings.');
-            } else if (errMsg.includes('NotFoundError')) {
-              setErrorState('No camera found on this device.');
-            } else {
-              setErrorState('Could not initialize the camera. Is another app using it?');
-            }
-          });
-      });
+      function captureStream() {
+        const video = document.querySelector(`#${QR_SCANNER_ID} video`) as HTMLVideoElement;
+        if (video && video.srcObject) {
+          streamRef.current = video.srcObject as MediaStream;
+        }
+      }
+
+      scanner.start({ facingMode: 'environment' }, config, handleSuccess, () => { })
+        .then(captureStream)
+        .catch((err: any) => {
+          // Fallback for devices without environment camera
+          scanner.start({ facingMode: 'user' }, config, handleSuccess, () => { })
+            .then(captureStream)
+            .catch((err2: any) => {
+              const errMsg = err2?.name || err2?.message || String(err2);
+              if (errMsg.includes('NotAllowedError') || errMsg.includes('Permission')) {
+                setErrorState('Permission to access camera was denied. Please allow camera access in your browser settings.');
+              } else if (errMsg.includes('NotFoundError')) {
+                setErrorState('No camera found on this device.');
+              } else {
+                setErrorState('Could not initialize the camera. Is another app using it?');
+              }
+            });
+        });
+    }, 100);
 
     return () => {
+      clearTimeout(timer);
       stopStreamAndScanner();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

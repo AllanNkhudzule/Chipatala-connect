@@ -1,0 +1,25 @@
+[
+  {
+    "id": "REP-8U5V-NWF",
+    "type": "error",
+    "severity": "critical",
+    "message": "test persistence",
+    "receivedAt": 1772257068308
+  },
+  {
+    "id": "REP-ATJS-62Z",
+    "type": "manual",
+    "severity": "low",
+    "stepsToReproduce": "scan",
+    "expectedBehavior": "one qr scanner at a time",
+    "actualBehavior": "two at once",
+    "message": "User reported issue",
+    "os": "Linux x86_64",
+    "browser": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+    "screenWidth": 1029,
+    "screenHeight": 661,
+    "url": "http://localhost:5173/history",
+    "timestamp": "2026-02-28T05:46:36.420Z",
+    "receivedAt": 1772257596435
+  }
+]

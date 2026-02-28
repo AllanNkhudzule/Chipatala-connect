@@ -1,4 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
+import { Building2, ClipboardList, Pill, FlaskConical, Stethoscope } from 'lucide-react';
+import type { MedicalRecord } from '../types';
 import { medicalTimeline } from '../data/mockData';
 
 const typeBadge: Record<string, string> = {

@@ -11,31 +11,34 @@ export default function QrScanner({ onResult }: QrScannerProps) {
   const scannerRef = useRef<Html5Qrcode | null>(null);
 
   useEffect(() => {
-    const scanner = new Html5Qrcode(QR_SCANNER_ID);
-    scannerRef.current = scanner;
+    const timer = setTimeout(() => {
+      const scanner = new Html5Qrcode(QR_SCANNER_ID);
+      scannerRef.current = scanner;
 
-    const config = {
-      fps: 10,
-      qrbox: { width: 250, height: 250 },
-      rememberLastUsedCamera: true,
-    };
+      const config = {
+        fps: 10,
+        qrbox: { width: 250, height: 250 },
+        rememberLastUsedCamera: true,
+      };
 
-    function handleSuccess(decodedText: string) {
-      onResult(decodedText);
-    }
+      function handleSuccess(decodedText: string) {
+        onResult(decodedText);
+      }
 
-    function handleError() {
-      // ignore errors
-    }
+      function handleError() {
+        // ignore errors
+      }
 
-    scanner.start({ facingMode: 'environment' }, config, handleSuccess, handleError).catch(() => {
-      // Fallback for devices without environment camera
-      scanner.start({ facingMode: 'user' }, config, handleSuccess, handleError).catch(() => {
-        // ignore if no camera
+      scanner.start({ facingMode: 'environment' }, config, handleSuccess, handleError).catch(() => {
+        // Fallback for devices without environment camera
+        scanner.start({ facingMode: 'user' }, config, handleSuccess, handleError).catch(() => {
+          // ignore if no camera
+        });
       });
-    });
+    }, 100);
 
     return () => {
+      clearTimeout(timer);
       if (scannerRef.current?.isScanning) {
         scannerRef.current.stop().catch(() => {
           // ignore stop errors
