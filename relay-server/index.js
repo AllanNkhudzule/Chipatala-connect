@@ -6,9 +6,11 @@ const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json({ limit: '5mb' }));
+app.use(express.static('public'));
 
 const records = new Map();
 const accessGrants = new Map();
+const reports = [];
 
 function generateCode(prefix) {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -58,6 +60,20 @@ app.get('/api/access-grants/:token', (req, res) => {
   if (!entry) return res.status(404).json({ error: 'Access grant not found or expired' });
   const { _createdAt, ...data } = entry;
   res.json(data);
+});
+
+app.post('/api/reports', (req, res) => {
+  reports.push({
+    id: generateCode('REP'),
+    ...req.body,
+    receivedAt: Date.now()
+  });
+  console.log(`[Telemetry] Received new ${req.body.type} report (${req.body.severity})`);
+  res.json({ ok: true });
+});
+
+app.get('/api/reports', (req, res) => {
+  res.json(reports);
 });
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));

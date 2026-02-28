@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { medicalTimeline } from '../data/mockData';
 
 const typeBadge: Record<string, string> = {
@@ -20,14 +20,36 @@ export default function MedicalHistory() {
   const [typeFilter, setTypeFilter] = useState('all');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  const [timeline, setTimeline] = useState(medicalTimeline);
 
-  const hospitals = useMemo(() => {
-    const set = new Set(medicalTimeline.map((e) => e.hospital));
-    return Array.from(set).sort();
+  useEffect(() => {
+    async function loadRecords() {
+      const { getRecords } = await import('../services/storage');
+      const saved = await getRecords();
+      const mapped = saved.map((r) => ({
+        date: r.date,
+        title: r.diagnosis || 'Retrieved Record',
+        type: r.type || 'consultation',
+        description: r.clinicalNotes || 'No notes provided.',
+        hospital: r.hospital || 'Unknown Facility',
+        doctor: r.doctor || 'Unknown Doctor',
+      }));
+
+      const combined = [...mapped, ...medicalTimeline].sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      );
+      setTimeline(combined);
+    }
+    loadRecords();
   }, []);
 
+  const hospitals = useMemo(() => {
+    const set = new Set(timeline.map((e) => e.hospital));
+    return Array.from(set).sort();
+  }, [timeline]);
+
   const filtered = useMemo(() => {
-    return medicalTimeline.filter((entry) => {
+    return timeline.filter((entry) => {
       if (hospitalFilter !== 'all' && entry.hospital !== hospitalFilter) return false;
       if (typeFilter !== 'all' && entry.type !== typeFilter) return false;
       if (dateFrom) {
@@ -40,12 +62,12 @@ export default function MedicalHistory() {
       }
       return true;
     });
-  }, [hospitalFilter, typeFilter, dateFrom, dateTo]);
+  }, [timeline, hospitalFilter, typeFilter, dateFrom, dateTo]);
 
-  const totalHospitals = new Set(medicalTimeline.map((e) => e.hospital)).size;
-  const totalRecords = medicalTimeline.length;
-  const totalPrescriptions = medicalTimeline.filter((e) => e.type === 'prescription').length;
-  const totalLabResults = medicalTimeline.filter((e) => e.type === 'lab_result').length;
+  const totalHospitals = new Set(timeline.map((e) => e.hospital)).size;
+  const totalRecords = timeline.length;
+  const totalPrescriptions = timeline.filter((e) => e.type === 'prescription').length;
+  const totalLabResults = timeline.filter((e) => e.type === 'lab_result').length;
 
   return (
     <>

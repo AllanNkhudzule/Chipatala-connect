@@ -74,7 +74,7 @@ export interface ActivityItem {
 export interface TimelineEntry {
   date: string;
   title: string;
-  type: 'prescription' | 'diagnosis' | 'lab_result' | 'consultation';
+  type: 'prescription' | 'diagnosis' | 'lab_result' | 'consultation' | 'referral';
   description: string;
   hospital: string;
   doctor: string;
