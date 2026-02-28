@@ -96,7 +96,7 @@ export default function RetrieveRecords() {
             <button
               className="btn btn-primary btn-lg"
               style={{ width: '100%', justifyContent: 'center' }}
-              onClick={handleRetrieve}
+              onClick={() => handleRetrieve()}
               disabled={!code.trim() || status === 'loading'}
             >
               {status === 'loading' ? 'Retrieving…' : 'Retrieve Record'}
