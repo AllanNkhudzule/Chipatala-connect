@@ -10,10 +10,10 @@ export const doctorProfile = {
 };
 
 export const dashboardStats = [
-  { icon: '👥', color: 'green' as const, value: '12', label: 'Patients Today' },
-  { icon: '🔓', color: 'blue' as const, value: '3', label: 'Active Sessions' },
-  { icon: '📋', color: 'yellow' as const, value: '8', label: 'Records Created Today' },
-  { icon: '✅', color: 'green' as const, value: '5', label: 'Records Sent' },
+  { icon: 'users', color: 'green' as const, value: '12', label: 'Patients Today' },
+  { icon: 'unlock', color: 'blue' as const, value: '3', label: 'Active Sessions' },
+  { icon: 'clipboard', color: 'yellow' as const, value: '8', label: 'Records Created Today' },
+  { icon: 'check', color: 'green' as const, value: '5', label: 'Records Sent' },
 ];
 
 export const activeSessions: Session[] = [
@@ -23,9 +23,9 @@ export const activeSessions: Session[] = [
 ];
 
 export const recentRecords: RecentRecord[] = [
-  { icon: '📋', iconColor: 'green', title: 'Prescription – Tamanda Mbewe', description: 'Amoxicillin 500mg, Ibuprofen 400mg', status: 'sent' },
-  { icon: '🔬', iconColor: 'blue', title: 'Lab Result – Chisomo Njobvu', description: 'Full blood count panel', status: 'sent' },
-  { icon: '📋', iconColor: 'yellow', title: 'Diagnosis – Mphatso Chirwa', description: 'Type 2 Diabetes – initial assessment', status: 'pending' },
-  { icon: '📋', iconColor: 'green', title: 'Prescription – Kondwani Msiska', description: 'Metformin 500mg, lifestyle guidance', status: 'sent' },
-  { icon: '🔬', iconColor: 'blue', title: 'Lab Result – Tionge Kamanga', description: 'Malaria RDT – Negative', status: 'sent' },
+  { icon: 'clipboard', iconColor: 'green', title: 'Prescription – Tamanda Mbewe', description: 'Amoxicillin 500mg, Ibuprofen 400mg', status: 'sent' },
+  { icon: 'flask', iconColor: 'blue', title: 'Lab Result – Chisomo Njobvu', description: 'Full blood count panel', status: 'sent' },
+  { icon: 'clipboard', iconColor: 'yellow', title: 'Diagnosis – Mphatso Chirwa', description: 'Type 2 Diabetes – initial assessment', status: 'pending' },
+  { icon: 'clipboard', iconColor: 'green', title: 'Prescription – Kondwani Msiska', description: 'Metformin 500mg, lifestyle guidance', status: 'sent' },
+  { icon: 'flask', iconColor: 'blue', title: 'Lab Result – Tionge Kamanga', description: 'Malaria RDT – Negative', status: 'sent' },
 ];

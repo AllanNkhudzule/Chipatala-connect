@@ -815,9 +815,30 @@ textarea.form-control { resize: vertical; min-height: 100px; }
   .filter-bar .form-control { min-width: 120px; }
 }
 
+
 @media (max-width: 480px) {
   .stat-grid { grid-template-columns: 1fr; }
   .topbar-search { display: none; }
   .welcome-card { padding: 20px; }
   .welcome-card h2 { font-size: 1.15rem; }
 }
+
+/* Login form validation */
+.field-error {
+  display: block;
+  font-size: .78rem;
+  color: var(--color-danger);
+  margin-top: 4px;
+}
+
+.form-control.input-error {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, .12);
+}
+
+/* Main content padding for patient layout */
+.main-content {
+  padding: 28px;
+  flex: 1;
+}
+

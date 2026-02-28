@@ -3,6 +3,42 @@ import { useNavigate } from 'react-router-dom';
 import { patientProfile, recentActivity } from '../data/mockData';
 import { grantAccess } from '../services/relay';
 import { QRCodeSVG } from 'qrcode.react';
+import {
+  Droplets,
+  Heart,
+  Activity,
+  Weight,
+  AlertTriangle,
+  Wind,
+  Pill,
+  ClipboardList,
+  FlaskConical,
+  ShieldCheck,
+  CheckCircle2,
+  XCircle,
+  RefreshCw,
+} from 'lucide-react';
+
+// Map string icon identifiers to Lucide components
+const vitalIconMap: Record<string, React.ReactNode> = {
+  droplets: <Droplets size={18} strokeWidth={1.75} aria-hidden="true" />,
+  heart: <Heart size={18} strokeWidth={1.75} aria-hidden="true" />,
+  activity: <Activity size={18} strokeWidth={1.75} aria-hidden="true" />,
+  weight: <Weight size={18} strokeWidth={1.75} aria-hidden="true" />,
+  alert: <AlertTriangle size={18} strokeWidth={1.75} aria-hidden="true" />,
+};
+
+const conditionIconMap: Record<string, React.ReactNode> = {
+  lungs: <Wind size={16} strokeWidth={1.75} aria-hidden="true" />,
+  pill: <Pill size={16} strokeWidth={1.75} aria-hidden="true" />,
+};
+
+const activityIconMap: Record<string, React.ReactNode> = {
+  clipboard: <ClipboardList size={16} strokeWidth={1.75} aria-hidden="true" />,
+  flask: <FlaskConical size={16} strokeWidth={1.75} aria-hidden="true" />,
+  hospital: <Activity size={16} strokeWidth={1.75} aria-hidden="true" />,
+  shield: <ShieldCheck size={16} strokeWidth={1.75} aria-hidden="true" />,
+};
 
 const statusBadge: Record<string, string> = {
   managed: 'badge badge-green',
@@ -112,7 +148,9 @@ export default function Dashboard() {
         <div className="vitals-grid">
           {vitals.map((v) => (
             <div className="vital-card" key={v.label}>
-              <div className="vital-icon">{v.icon}</div>
+              <div className="vital-icon">
+                {vitalIconMap[v.icon] || <Activity size={18} strokeWidth={1.75} aria-hidden="true" />}
+              </div>
               <div className="vital-value">{v.value}</div>
               <div className="vital-label">{v.label}</div>
             </div>
@@ -130,17 +168,12 @@ export default function Dashboard() {
           <ul className="activity-list">
             {activeConditions.map((c) => (
               <li className="activity-item" key={c.name}>
-                <span
-                  className="activity-icon"
-                  style={{ background: 'var(--color-primary-bg)' }}
-                >
-                  {c.icon}
+                <span className="activity-icon" style={{ background: 'var(--color-primary-bg)' }}>
+                  {conditionIconMap[c.icon] || <Pill size={16} strokeWidth={1.75} aria-hidden="true" />}
                 </span>
                 <div className="activity-body">
                   <strong>{c.name}</strong>
-                  <p>
-                    {c.hospital} &middot; {c.date}
-                  </p>
+                  <p>{c.hospital} &middot; {c.date}</p>
                 </div>
                 <span className={statusBadge[c.status] ?? 'badge badge-gray'}>
                   {c.status.charAt(0).toUpperCase() + c.status.slice(1)}
@@ -158,17 +191,12 @@ export default function Dashboard() {
           <ul className="activity-list">
             {currentMedications.map((m) => (
               <li className="activity-item" key={m.name}>
-                <span
-                  className="activity-icon"
-                  style={{ background: 'var(--color-info-bg)', fontSize: '1rem' }}
-                >
-                  💊
+                <span className="activity-icon" style={{ background: 'var(--color-info-bg)' }}>
+                  <Pill size={16} strokeWidth={1.75} aria-hidden="true" />
                 </span>
                 <div className="activity-body">
                   <strong>{m.name}</strong>
-                  <p>
-                    {m.dosage} &middot; {m.prescribedBy}
-                  </p>
+                  <p>{m.dosage} &middot; {m.prescribedBy}</p>
                 </div>
               </li>
             ))}
@@ -189,7 +217,7 @@ export default function Dashboard() {
                 className="activity-icon"
                 style={{ background: activityIconBg[a.iconColor] }}
               >
-                {a.icon}
+                {activityIconMap[a.icon] || <Activity size={16} strokeWidth={1.75} aria-hidden="true" />}
               </span>
               <div className="activity-body">
                 <strong>{a.title}</strong>
@@ -218,7 +246,7 @@ export default function Dashboard() {
               </>
             ) : consentToken ? (
               <>
-                <div style={{ fontSize: '3rem', marginBottom: 12 }}>✅</div>
+                <CheckCircle2 size={48} strokeWidth={1.25} style={{ color: 'var(--color-success, #16a34a)', marginBottom: 12 }} aria-hidden="true" />
                 <h3 style={{ fontSize: '1.1rem', marginBottom: 8 }}>Access Token Generated</h3>
                 <p style={{ color: 'var(--color-text-secondary)', fontSize: '.85rem', marginBottom: 16 }}>
                   Share this token with your doctor. It expires in 30 minutes.
@@ -226,20 +254,18 @@ export default function Dashboard() {
                 <div style={{ marginBottom: 20 }}>
                   <QRCodeSVG value={consentToken} size={220} level="H" />
                 </div>
-                <div
-                  style={{
-                    background: 'var(--color-surface-alt)',
-                    borderRadius: 'var(--radius)',
-                    padding: '12px 20px',
-                    fontFamily: "'Courier New', monospace",
-                    fontSize: '1.2rem',
-                    fontWeight: 700,
-                    letterSpacing: '.12em',
-                    color: 'var(--color-primary)',
-                    marginBottom: 20,
-                    wordBreak: 'break-all',
-                  }}
-                >
+                <div style={{
+                  background: 'var(--color-surface-alt)',
+                  borderRadius: 'var(--radius)',
+                  padding: '12px 20px',
+                  fontFamily: "'Courier New', monospace",
+                  fontSize: '1.2rem',
+                  fontWeight: 700,
+                  letterSpacing: '.12em',
+                  color: 'var(--color-primary)',
+                  marginBottom: 20,
+                  wordBreak: 'break-all',
+                }}>
                   {consentToken}
                 </div>
                 <button className="btn btn-primary" onClick={closeModal}>
@@ -248,13 +274,18 @@ export default function Dashboard() {
               </>
             ) : (
               <>
-                <div style={{ fontSize: '3rem', marginBottom: 12 }}>❌</div>
+                <XCircle size={48} strokeWidth={1.25} style={{ color: 'var(--color-danger)', marginBottom: 12 }} aria-hidden="true" />
                 <h3 style={{ fontSize: '1.1rem', marginBottom: 8 }}>Failed to Generate Token</h3>
                 <p style={{ color: 'var(--color-text-secondary)', fontSize: '.85rem', marginBottom: 16 }}>
                   The relay service may be offline. Please try again later.
                 </p>
                 <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-                  <button className="btn btn-primary" onClick={handleGrantAccess}>
+                  <button
+                    className="btn btn-primary"
+                    onClick={handleGrantAccess}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                  >
+                    <RefreshCw size={14} strokeWidth={1.75} aria-hidden="true" />
                     Retry
                   </button>
                   <button className="btn btn-secondary" onClick={closeModal}>

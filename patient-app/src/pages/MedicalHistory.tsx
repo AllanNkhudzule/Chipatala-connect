@@ -16,6 +16,8 @@ const typeLabel: Record<string, string> = {
 };
 
 export default function MedicalHistory() {
+  const [records, setRecords] = useState<MedicalRecord[]>([]);
+  const [status, setStatus] = useState<'loading' | 'error' | 'success'>('loading');
   const [hospitalFilter, setHospitalFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
   const [dateFrom, setDateFrom] = useState('');
@@ -120,22 +122,30 @@ export default function MedicalHistory() {
       {/* Stat grid */}
       <div className="stat-grid">
         <div className="stat-card">
-          <div className="stat-icon green">🏥</div>
+          <div className="stat-icon green">
+            <Building2 size={20} strokeWidth={1.75} aria-hidden="true" />
+          </div>
           <div className="stat-value">{totalHospitals}</div>
           <div className="stat-label">Hospitals Visited</div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon blue">📋</div>
+          <div className="stat-icon blue">
+            <ClipboardList size={20} strokeWidth={1.75} aria-hidden="true" />
+          </div>
           <div className="stat-value">{totalRecords}</div>
           <div className="stat-label">Total Records</div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon yellow">💊</div>
+          <div className="stat-icon yellow">
+            <Pill size={20} strokeWidth={1.75} aria-hidden="true" />
+          </div>
           <div className="stat-value">{totalPrescriptions}</div>
           <div className="stat-label">Prescriptions</div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon red">🔬</div>
+          <div className="stat-icon red">
+            <FlaskConical size={20} strokeWidth={1.75} aria-hidden="true" />
+          </div>
           <div className="stat-value">{totalLabResults}</div>
           <div className="stat-label">Lab Results</div>
         </div>
@@ -144,19 +154,25 @@ export default function MedicalHistory() {
       {/* Timeline */}
       <div className="timeline">
         {filtered.map((entry, i) => (
-          <div className="timeline-item" key={i}>
+          <div className="timeline-item" key={entry.id || i}>
             <div className="timeline-date">{entry.date}</div>
             <div className="timeline-card">
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-                <h4>{entry.title}</h4>
+                <h4>{entry.diagnosis}</h4>
                 <span className={typeBadge[entry.type] ?? 'badge badge-gray'}>
                   {typeLabel[entry.type] ?? entry.type}
                 </span>
               </div>
-              <p>{entry.description}</p>
+              <p>{entry.clinicalNotes}</p>
               <div className="timeline-meta">
-                <span>🏥 {entry.hospital}</span>
-                <span>👨‍⚕️ {entry.doctor}</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  <Building2 size={14} strokeWidth={1.75} aria-hidden="true" />
+                  {entry.hospital}
+                </span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  <Stethoscope size={14} strokeWidth={1.75} aria-hidden="true" />
+                  {entry.doctor}
+                </span>
               </div>
             </div>
           </div>

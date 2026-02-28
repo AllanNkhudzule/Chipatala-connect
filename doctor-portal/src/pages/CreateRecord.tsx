@@ -43,6 +43,7 @@ export default function CreateRecord() {
 
   const buildRecord = (): MedicalRecord => ({
     id: crypto.randomUUID(),
+    resourceType: 'Bundle',
     type,
     patientName,
     patientId,
@@ -55,7 +56,7 @@ export default function CreateRecord() {
     doctor: doctorProfile.name,
     date: new Date().toISOString().split('T')[0],
     status: 'active',
-  });
+  } as MedicalRecord);
 
   const handleGenerate = async () => {
     if (!diagnosis.trim()) return;
