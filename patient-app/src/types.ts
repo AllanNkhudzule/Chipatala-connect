@@ -72,12 +72,16 @@ export interface ActivityItem {
 }
 
 export interface TimelineEntry {
+  id?: string;
   date: string;
   title: string;
   type: 'prescription' | 'diagnosis' | 'lab_result' | 'consultation' | 'referral';
   description: string;
   hospital: string;
   doctor: string;
+  // additional fields used in UI
+  diagnosis?: string;
+  clinicalNotes?: string;
 }
 
 export interface AccessGrant {
