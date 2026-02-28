@@ -1,6 +1,6 @@
 import type { Session, RecentRecord } from '../types';
 
-export const RELAY_URL = import.meta.env.VITE_RELAY_URL || 'http://localhost:3001';
+export const RELAY_URL = (import.meta.env.VITE_RELAY_URL as string | undefined) || 'http://localhost:3001';
 
 export const doctorProfile = {
   name: 'Dr. Grace Banda',

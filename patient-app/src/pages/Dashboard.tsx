@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { patientProfile, recentActivity } from '../data/mockData';
 import { grantAccess } from '../services/relay';
@@ -59,6 +59,51 @@ export default function Dashboard() {
   const [grantLoading, setGrantLoading] = useState(false);
   const [consentToken, setConsentToken] = useState<string | null>(null);
 
+  const [activeConditions, setActiveConditions] = useState(patientProfile.conditions);
+  const [currentMedications, setCurrentMedications] = useState(patientProfile.medications);
+  const [activities, setActivities] = useState(recentActivity);
+
+  useEffect(() => {
+    async function fetchDashboardData() {
+      const { getRecords } = await import('../services/storage');
+      const saved = await getRecords();
+      if (saved.length === 0) return; // fallback to mock data if empty
+
+      const conditions = saved
+        .filter((r) => r.diagnosis)
+        .map((r) => ({
+          name: r.diagnosis,
+          date: r.date,
+          hospital: r.hospital,
+          status: 'ongoing' as const,
+          icon: '🦠',
+        }));
+
+      const medications = saved.flatMap((r) =>
+        (r.prescriptions || []).map((p) => ({
+          name: p.medication,
+          dosage: `${p.dosage} ${p.frequency}`,
+          prescribedBy: r.doctor,
+        }))
+      );
+
+      const mappedActivities = saved.slice(0, 5).map((r) => ({
+        icon: '📄',
+        iconColor: 'blue' as const,
+        title: `Retrieved ${r.type}`,
+        description: `Record created by ${r.doctor} at ${r.hospital}`,
+        time: r.date,
+      }));
+
+      // Combine real data with mock
+      setActiveConditions([...conditions, ...patientProfile.conditions]);
+      setCurrentMedications([...medications, ...patientProfile.medications]);
+      setActivities([...mappedActivities, ...recentActivity]);
+    }
+
+    fetchDashboardData();
+  }, []);
+
   async function handleGrantAccess() {
     setShowGrantModal(true);
     setGrantLoading(true);
@@ -73,7 +118,7 @@ export default function Dashboard() {
     setConsentToken(null);
   }
 
-  const { name, nationalId, vitals, conditions, medications } = patientProfile;
+  const { name, nationalId, vitals } = patientProfile;
   const firstName = name.split(' ')[0];
 
   return (
@@ -121,7 +166,7 @@ export default function Dashboard() {
             <h2>Active Conditions</h2>
           </div>
           <ul className="activity-list">
-            {conditions.map((c) => (
+            {activeConditions.map((c) => (
               <li className="activity-item" key={c.name}>
                 <span className="activity-icon" style={{ background: 'var(--color-primary-bg)' }}>
                   {conditionIconMap[c.icon] || <Pill size={16} strokeWidth={1.75} aria-hidden="true" />}
@@ -144,7 +189,7 @@ export default function Dashboard() {
             <h2>Current Medications</h2>
           </div>
           <ul className="activity-list">
-            {medications.map((m) => (
+            {currentMedications.map((m) => (
               <li className="activity-item" key={m.name}>
                 <span className="activity-icon" style={{ background: 'var(--color-info-bg)' }}>
                   <Pill size={16} strokeWidth={1.75} aria-hidden="true" />
@@ -166,7 +211,7 @@ export default function Dashboard() {
           <button className="card-action">View All</button>
         </div>
         <ul className="activity-list">
-          {recentActivity.map((a, i) => (
+          {activities.map((a, i) => (
             <li className="activity-item" key={i}>
               <span
                 className="activity-icon"

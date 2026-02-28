@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import RetrieveRecords from './pages/RetrieveRecords';
 import MedicalHistory from './pages/MedicalHistory';
 import Profile from './pages/Profile';
+import ReportIssue from './components/ReportIssue';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem('token');
@@ -17,10 +18,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <>
-      <Toaster position="top-right" />
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+        <Route element={<Layout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/retrieve" element={<RetrieveRecords />} />
           <Route path="/history" element={<MedicalHistory />} />
@@ -28,6 +27,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
+      <ReportIssue />
     </>
   );
 }

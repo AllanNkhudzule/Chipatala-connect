@@ -46,7 +46,7 @@ export async function grantAccess(durationMinutes: number = 30): Promise<string 
       records: allRecords,
       timeline: medicalTimeline,
       grantedAt: new Date().toISOString(),
-      expiresIn: durationMinutes,
+      expiresIn: durationMinutes * 60,
     };
     const res = await authFetch(`${RELAY_URL}/api/access-grants`, {
       method: 'POST',

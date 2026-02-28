@@ -11,8 +11,12 @@ const JWT_SECRET = process.env.JWT_SECRET || 'chipatala-secret-key';
 
 app.use(cors());
 app.use(express.json({ limit: '5mb' }));
+app.use(express.static('public'));
 
-// Utility to generate REC- or PAT- codes
+const records = new Map();
+const accessGrants = new Map();
+const reports = [];
+
 function generateCode(prefix) {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let code = '';
@@ -169,6 +173,20 @@ cron.schedule('* * * * *', async () => {
     await prisma.relayBundle.delete({ where: { code: bundle.code } });
     console.log(`[AUDIT] RelayBundle ${bundle.code} auto-deleted by cron job.`);
   }
+});
+
+app.post('/api/reports', (req, res) => {
+  reports.push({
+    id: generateCode('REP'),
+    ...req.body,
+    receivedAt: Date.now()
+  });
+  console.log(`[Telemetry] Received new ${req.body.type} report (${req.body.severity})`);
+  res.json({ ok: true });
+});
+
+app.get('/api/reports', (req, res) => {
+  res.json(reports);
 });
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));

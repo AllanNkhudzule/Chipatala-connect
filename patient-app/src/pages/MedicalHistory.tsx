@@ -1,16 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import type { MedicalRecord } from '../types';
-import { getRecords } from '../services/storage';
-import { useNavigate } from 'react-router-dom';
-import {
-  Building2,
-  ClipboardList,
-  Pill,
-  FlaskConical,
-  Stethoscope,
-  Inbox,
-  RefreshCw,
-} from 'lucide-react';
+import { medicalTimeline } from '../data/mockData';
 
 const typeBadge: Record<string, string> = {
   prescription: 'badge badge-green',
@@ -33,26 +22,36 @@ export default function MedicalHistory() {
   const [typeFilter, setTypeFilter] = useState('all');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
-  const navigate = useNavigate();
+  const [timeline, setTimeline] = useState(medicalTimeline);
 
   useEffect(() => {
-    getRecords()
-      .then((data) => {
-        setRecords(data);
-        setStatus('success');
-      })
-      .catch(() => {
-        setStatus('error');
-      });
+    async function loadRecords() {
+      const { getRecords } = await import('../services/storage');
+      const saved = await getRecords();
+      const mapped = saved.map((r) => ({
+        date: r.date,
+        title: r.diagnosis || 'Retrieved Record',
+        type: r.type || 'consultation',
+        description: r.clinicalNotes || 'No notes provided.',
+        hospital: r.hospital || 'Unknown Facility',
+        doctor: r.doctor || 'Unknown Doctor',
+      }));
+
+      const combined = [...mapped, ...medicalTimeline].sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      );
+      setTimeline(combined);
+    }
+    loadRecords();
   }, []);
 
   const hospitals = useMemo(() => {
-    const set = new Set(records.map((e) => e.hospital));
+    const set = new Set(timeline.map((e) => e.hospital));
     return Array.from(set).sort();
-  }, [records]);
+  }, [timeline]);
 
   const filtered = useMemo(() => {
-    return records.filter((entry) => {
+    return timeline.filter((entry) => {
       if (hospitalFilter !== 'all' && entry.hospital !== hospitalFilter) return false;
       if (typeFilter !== 'all' && entry.type !== typeFilter) return false;
       if (dateFrom) {
@@ -65,52 +64,12 @@ export default function MedicalHistory() {
       }
       return true;
     });
-  }, [hospitalFilter, typeFilter, dateFrom, dateTo, records]);
+  }, [timeline, hospitalFilter, typeFilter, dateFrom, dateTo]);
 
-  const totalHospitals = new Set(records.map((e) => e.hospital)).size;
-  const totalRecords = records.length;
-  const totalPrescriptions = records.filter((e) => e.type === 'prescription').length;
-  const totalLabResults = records.filter((e) => e.type === 'lab_result').length;
-
-  if (status === 'loading') {
-    return (
-      <div style={{ textAlign: 'center', marginTop: 80 }}>
-        <div className="loading-spinner" style={{ margin: '0 auto 16px' }} />
-        <p style={{ color: 'var(--color-text-secondary)' }}>Loading your medical history...</p>
-      </div>
-    );
-  }
-
-  if (status === 'error') {
-    return (
-      <div className="card center-card" style={{ marginTop: 40, textAlign: 'center', padding: 32 }}>
-        <h2 style={{ color: 'var(--color-danger)', marginBottom: 12 }}>Error Loading Records</h2>
-        <p style={{ color: 'var(--color-text-secondary)', marginBottom: 20 }}>
-          We encountered an error while trying to read your encrypted medical records.
-        </p>
-        <button className="btn btn-primary" onClick={() => window.location.reload()}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-          <RefreshCw size={16} strokeWidth={1.75} aria-hidden="true" />
-          Retry
-        </button>
-      </div>
-    );
-  }
-
-  if (records.length === 0) {
-    return (
-      <div className="card center-card" style={{ marginTop: 40, textAlign: 'center', padding: 40 }}>
-        <Inbox size={48} strokeWidth={1.25} style={{ color: 'var(--color-text-muted)', marginBottom: 16 }} aria-hidden="true" />
-        <h2 style={{ marginBottom: 12 }}>No records yet.</h2>
-        <p style={{ color: 'var(--color-text-secondary)', marginBottom: 24 }}>
-          Scan a QR code from your doctor to add your first record.
-        </p>
-        <button className="btn btn-primary" onClick={() => navigate('/retrieve')}>
-          Scan QR Code
-        </button>
-      </div>
-    );
-  }
+  const totalHospitals = new Set(timeline.map((e) => e.hospital)).size;
+  const totalRecords = timeline.length;
+  const totalPrescriptions = timeline.filter((e) => e.type === 'prescription').length;
+  const totalLabResults = timeline.filter((e) => e.type === 'lab_result').length;
 
   return (
     <>
