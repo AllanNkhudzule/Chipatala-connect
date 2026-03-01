@@ -8,10 +8,9 @@ import MedicalHistory from './pages/MedicalHistory';
 import Profile from './pages/Profile';
 import ReportIssue from './components/ReportIssue';
 
+import NotFound from './pages/NotFound';
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const token = localStorage.getItem('token');
-  const location = useLocation();
-  if (!token) return <Navigate to="/login" state={{ from: location }} replace />;
   return <>{children}</>;
 }
 
@@ -24,7 +23,7 @@ export default function App() {
           <Route path="/retrieve" element={<RetrieveRecords />} />
           <Route path="/history" element={<MedicalHistory />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
       <ReportIssue />

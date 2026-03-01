@@ -7,10 +7,9 @@ import PatientAccess from './pages/PatientAccess';
 import CreateRecord from './pages/CreateRecord';
 import Profile from './pages/Profile';
 
+import NotFound from './pages/NotFound';
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const token = localStorage.getItem('token');
-  const location = useLocation();
-  if (!token) return <Navigate to="/login" state={{ from: location }} replace />;
   return <>{children}</>;
 }
 
@@ -25,8 +24,8 @@ export default function App() {
           <Route path="/patient-access" element={<PatientAccess />} />
           <Route path="/create-record" element={<CreateRecord />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
-        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>
   );
