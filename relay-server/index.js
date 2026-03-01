@@ -14,7 +14,7 @@ const getAllowedOrigins = () => {
   const raw = process.env.ALLOWED_ORIGINS || 'https://chipatalaconnect.netlify.app';
   return raw
     .split(',')
-    .map(origin => origin.trim())
+    .map(origin => origin.trim().replace(/^["']|["']$/g, '').replace(/\/$/, ''))
     .filter(Boolean);
 };
 
