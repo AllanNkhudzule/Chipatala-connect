@@ -9,20 +9,45 @@ const authMiddleware = require('./authMiddleware');
 const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET;
 
-const allowedOrigins = ['http://localhost:3001', 'http://localhost:5173', 'https://chipatalaconnect.netlify.app', 'https://chipatalaconnect-patient.netlify.app'];
+// --- CORS Configuration ---
+const getAllowedOrigins = () => {
+  const raw = process.env.ALLOWED_ORIGINS || 'https://chipatalaconnect.netlify.app';
+  return raw
+    .split(',')
+    .map(origin => origin.trim())
+    .filter(Boolean);
+};
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (e.g. server-to-server, Postman, curl)
+    if (!origin) return callback(null, true);
+
+    const allowedOrigins = getAllowedOrigins();
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    // Explicit audit log per requirements
+    console.error(`[AUDIT] CORS_VIOLATION: Blocked origin '${origin}'`);
+    return callback(new Error(`CORS policy: origin '${origin}' is not permitted.`));
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Accept',
+    'Origin',
+  ],
+  exposedHeaders: ['Content-Length', 'X-Request-Id'],
+  credentials: true,
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json({ limit: '5mb' }));
 
 
