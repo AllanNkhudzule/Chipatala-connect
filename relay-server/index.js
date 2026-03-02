@@ -14,10 +14,9 @@ const getAllowedOrigins = () => {
   const raw = process.env.ALLOWED_ORIGINS || 'https://chipatalaconnect.netlify.app';
   const defaults = [
     'https://chipatalaconnect.netlify.app',
-    'https://chipatala-doctor.netlify.app',
-    'https://chipatala-patient.netlify.app',
-    'http://localhost:5173',
-    'http://localhost:5174',
+    'https://chipatalaconnect-patient.netlify.app',
+    // 'http://localhost:5173',
+    // 'http://localhost:3001',
   ];
 
   const processed = raw
