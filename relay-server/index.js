@@ -9,6 +9,13 @@ const authMiddleware = require('./authMiddleware');
 const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET;
 
+// --- Debug Logger (MUST BE TOP-LEVEL) ---
+app.use((req, res, next) => {
+  const origin = req.headers.origin || 'NO_ORIGIN';
+  console.log(`[HTTP_TRAFFIC] ${req.method} ${req.url} | Origin: ${origin} | Headers: ${JSON.stringify(req.headers)}`);
+  next();
+});
+
 // --- CORS Configuration ---
 const getAllowedOrigins = () => {
   const raw = process.env.ALLOWED_ORIGINS || '';
@@ -46,18 +53,22 @@ const corsOptions = {
     });
 
     if (isAllowed) {
-      console.log(`[CORS] Allowed: ${origin}`);
+      console.log(`[CORS] Accepted (List Match): ${origin}`);
       return callback(null, true);
     }
 
-    // Safety fallback for Netlify domains during debug
-    if (normalizedOrigin.endsWith('.netlify.app')) {
-      console.warn(`[CORS] Debug-Allowed (Netlify Match): ${origin}`);
+    // Safety fallback for any Netlify or Localhost domains during debug
+    const isPermittedDomain = normalizedOrigin.includes('netlify.app') ||
+      normalizedOrigin.includes('localhost') ||
+      normalizedOrigin.includes('127.0.0.1');
+
+    if (isPermittedDomain) {
+      console.warn(`[CORS] Accepted (Domain Match): ${origin}`);
       return callback(null, true);
     }
 
     // Explicit audit log per requirements
-    console.error(`[CORS] Rejected: ${origin}. Allowed origins were: ${allowedOrigins.join(', ')}`);
+    console.error(`[CORS] Rejected: ${origin}. Expected one of: ${allowedOrigins.join(', ')}`);
     return callback(null, false);
   },
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -75,13 +86,6 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
-
-// --- Debug Logger ---
-app.use((req, res, next) => {
-  const origin = req.headers.origin || 'NO_ORIGIN';
-  console.log(`[HTTP] ${req.method} ${req.url} | Origin: ${origin}`);
-  next();
-});
 
 app.use(express.json({ limit: '5mb' }));
 
