@@ -9,13 +9,6 @@ const authMiddleware = require('./authMiddleware');
 const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET;
 
-// --- Debug Logger ---
-app.use((req, res, next) => {
-  const origin = req.headers.origin || 'NO_ORIGIN';
-  console.log(`[HTTP] ${req.method} ${req.url} | Origin: ${origin}`);
-  next();
-});
-
 // --- CORS Configuration ---
 const getAllowedOrigins = () => {
   const raw = process.env.ALLOWED_ORIGINS || '';
@@ -65,8 +58,6 @@ const corsOptions = {
 
     // Explicit audit log per requirements
     console.error(`[CORS] Rejected: ${origin}. Allowed origins were: ${allowedOrigins.join(', ')}`);
-    // Using callback(null, false) allows CORS to fail gracefully (no header sent)
-    // without triggering Express error handlers that might strip other headers or hang.
     return callback(null, false);
   },
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -79,11 +70,19 @@ const corsOptions = {
   ],
   exposedHeaders: ['Content-Length', 'X-Request-Id'],
   credentials: true,
-  optionsSuccessStatus: 204,
+  optionsSuccessStatus: 200, // Changed to 200 for better compatibility
 };
 
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
+
+// --- Debug Logger ---
+app.use((req, res, next) => {
+  const origin = req.headers.origin || 'NO_ORIGIN';
+  console.log(`[HTTP] ${req.method} ${req.url} | Origin: ${origin}`);
+  next();
+});
+
 app.use(express.json({ limit: '5mb' }));
 
 
