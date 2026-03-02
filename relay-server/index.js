@@ -12,10 +12,20 @@ const JWT_SECRET = process.env.JWT_SECRET;
 // --- CORS Configuration ---
 const getAllowedOrigins = () => {
   const raw = process.env.ALLOWED_ORIGINS || 'https://chipatalaconnect.netlify.app';
-  return raw
+  const defaults = [
+    'https://chipatalaconnect.netlify.app',
+    'https://chipatala-doctor.netlify.app',
+    'https://chipatala-patient.netlify.app',
+    'http://localhost:5173',
+    'http://localhost:5174',
+  ];
+
+  const processed = raw
     .split(',')
     .map(origin => origin.trim().replace(/^["']|["']$/g, '').replace(/\/$/, ''))
     .filter(Boolean);
+
+  return Array.from(new Set([...processed, ...defaults]));
 };
 
 const corsOptions = {
@@ -24,14 +34,17 @@ const corsOptions = {
     if (!origin) return callback(null, true);
 
     const allowedOrigins = getAllowedOrigins();
+    const normalizedOrigin = origin.replace(/\/$/, '');
 
-    if (allowedOrigins.includes(origin)) {
+    if (allowedOrigins.some(o => o.replace(/\/$/, '') === normalizedOrigin)) {
       return callback(null, true);
     }
 
     // Explicit audit log per requirements
-    console.error(`[AUDIT] CORS_VIOLATION: Blocked origin '${origin}'`);
-    return callback(new Error(`CORS policy: origin '${origin}' is not permitted.`));
+    console.warn(`[AUDIT] CORS_REJECTED: Origin '${origin}' is not in allowed list.`);
+    // Using callback(null, false) allows CORS to fail gracefully (no header sent)
+    // without triggering Express error handlers that might strip other headers or hang.
+    return callback(null, false);
   },
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: [
