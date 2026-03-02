@@ -9,38 +9,62 @@ const authMiddleware = require('./authMiddleware');
 const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET;
 
+// --- Debug Logger ---
+app.use((req, res, next) => {
+  const origin = req.headers.origin || 'NO_ORIGIN';
+  console.log(`[HTTP] ${req.method} ${req.url} | Origin: ${origin}`);
+  next();
+});
+
 // --- CORS Configuration ---
 const getAllowedOrigins = () => {
-  const raw = process.env.ALLOWED_ORIGINS || 'https://chipatalaconnect.netlify.app';
+  const raw = process.env.ALLOWED_ORIGINS || '';
   const defaults = [
     'https://chipatalaconnect.netlify.app',
     'https://chipatalaconnect-patient.netlify.app',
-    // 'http://localhost:5173',
-    // 'http://localhost:3001',
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://localhost:3001',
   ];
 
   const processed = raw
     .split(',')
-    .map(origin => origin.trim().replace(/^["']|["']$/g, '').replace(/\/$/, ''))
+    .map(origin => origin.trim().replace(/^["']|["']$/g, '').replace(/\/$/, '').toLowerCase())
     .filter(Boolean);
 
-  return Array.from(new Set([...processed, ...defaults]));
+  const finalOrigins = Array.from(new Set([...processed, ...defaults]));
+  return finalOrigins;
 };
 
 const corsOptions = {
   origin: (origin, callback) => {
     // Allow requests with no origin (e.g. server-to-server, Postman, curl)
-    if (!origin) return callback(null, true);
+    if (!origin) {
+      console.log('[CORS] Allowed: No origin header provided');
+      return callback(null, true);
+    }
 
     const allowedOrigins = getAllowedOrigins();
-    const normalizedOrigin = origin.replace(/\/$/, '');
+    const normalizedOrigin = origin.replace(/\/$/, '').toLowerCase();
 
-    if (allowedOrigins.some(o => o.replace(/\/$/, '') === normalizedOrigin)) {
+    const isAllowed = allowedOrigins.some(o => {
+      const normalizedAllowed = o.replace(/\/$/, '').toLowerCase();
+      return normalizedAllowed === normalizedOrigin;
+    });
+
+    if (isAllowed) {
+      console.log(`[CORS] Allowed: ${origin}`);
+      return callback(null, true);
+    }
+
+    // Safety fallback for Netlify domains during debug
+    if (normalizedOrigin.endsWith('.netlify.app')) {
+      console.warn(`[CORS] Debug-Allowed (Netlify Match): ${origin}`);
       return callback(null, true);
     }
 
     // Explicit audit log per requirements
-    console.warn(`[AUDIT] CORS_REJECTED: Origin '${origin}' is not in allowed list.`);
+    console.error(`[CORS] Rejected: ${origin}. Allowed origins were: ${allowedOrigins.join(', ')}`);
     // Using callback(null, false) allows CORS to fail gracefully (no header sent)
     // without triggering Express error handlers that might strip other headers or hang.
     return callback(null, false);
