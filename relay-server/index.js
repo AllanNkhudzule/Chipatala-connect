@@ -1,99 +1,81 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const app = express();
-const prisma = require('./prismaClient');
-const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
+const cron = require('node-cron');
+const fs = require('fs');
+const path = require('path');
+const prisma = require('./prismaClient');
 const authMiddleware = require('./authMiddleware');
+const app = express();
 const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET;
 
-// --- Debug Logger (MUST BE TOP-LEVEL) ---
-app.use((req, res, next) => {
-  const origin = req.headers.origin || 'NO_ORIGIN';
-  console.log(`[HTTP_TRAFFIC] ${req.method} ${req.url} | Origin: ${origin} | Headers: ${JSON.stringify(req.headers)}`);
-  next();
-});
-
 // --- CORS Configuration ---
-const getAllowedOrigins = () => {
-  const raw = process.env.ALLOWED_ORIGINS || '';
-  const defaults = [
-    'https://chipatalaconnect.netlify.app',
-    'https://chipatalaconnect-patient.netlify.app',
-    'http://localhost:5173',
-    'http://localhost:5174',
-    'http://localhost:3001',
-  ];
+const ALLOWED_ORIGINS = [
+  'https://chipatalaconnect.netlify.app',
+  'https://chipatalaconnect-patient.netlify.app',
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:3001',
+];
 
-  const processed = raw
+// Merge any extra origins from the env var
+if (process.env.ALLOWED_ORIGINS) {
+  process.env.ALLOWED_ORIGINS
     .split(',')
-    .map(origin => origin.trim().replace(/^["']|["']$/g, '').replace(/\/$/, '').toLowerCase())
-    .filter(Boolean);
-
-  const finalOrigins = Array.from(new Set([...processed, ...defaults]));
-  return finalOrigins;
-};
+    .map(o => o.trim().replace(/^['"]+|['"]+$/g, '').replace(/\/$/, ''))
+    .filter(Boolean)
+    .forEach(o => { if (!ALLOWED_ORIGINS.includes(o)) ALLOWED_ORIGINS.push(o); });
+}
 
 const corsOptions = {
   origin: (origin, callback) => {
-    // Allow requests with no origin (e.g. server-to-server, Postman, curl)
     if (!origin) {
-      console.log('[CORS] Allowed: No origin header provided');
+      return callback(null, true); // allow server-to-server / Postman / curl
+    }
+    const normalized = origin.replace(/\/$/, '').toLowerCase();
+    const allowed =
+      ALLOWED_ORIGINS.some(o => o.toLowerCase() === normalized) ||
+      normalized.includes('netlify.app') ||
+      normalized.includes('localhost') ||
+      normalized.includes('127.0.0.1');
+
+    if (allowed) {
+      console.log(`[CORS] Accepted: ${origin}`);
       return callback(null, true);
     }
-
-    const allowedOrigins = getAllowedOrigins();
-    const normalizedOrigin = origin.replace(/\/$/, '').toLowerCase();
-
-    const isAllowed = allowedOrigins.some(o => {
-      const normalizedAllowed = o.replace(/\/$/, '').toLowerCase();
-      return normalizedAllowed === normalizedOrigin;
-    });
-
-    if (isAllowed) {
-      console.log(`[CORS] Accepted (List Match): ${origin}`);
-      return callback(null, true);
-    }
-
-    // Safety fallback for any Netlify or Localhost domains during debug
-    const isPermittedDomain = normalizedOrigin.includes('netlify.app') ||
-      normalizedOrigin.includes('localhost') ||
-      normalizedOrigin.includes('127.0.0.1');
-
-    if (isPermittedDomain) {
-      console.warn(`[CORS] Accepted (Domain Match): ${origin}`);
-      return callback(null, true);
-    }
-
-    // Explicit audit log per requirements
-    console.error(`[CORS] Rejected: ${origin}. Expected one of: ${allowedOrigins.join(', ')}`);
-    return callback(null, false);
+    console.error(`[CORS] Rejected: ${origin}`);
+    return callback(new Error(`CORS: origin ${origin} not allowed`));
   },
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: [
-    'Content-Type',
-    'Authorization',
-    'X-Requested-With',
-    'Accept',
-    'Origin',
-  ],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
   exposedHeaders: ['Content-Length', 'X-Request-Id'],
   credentials: true,
-  optionsSuccessStatus: 200, // Changed to 200 for better compatibility
+  optionsSuccessStatus: 204,
 };
 
-app.use(cors(corsOptions));
+// ─── PREFLIGHT: must come BEFORE everything else ───────────────────────────
+// This ensures OPTIONS requests always get CORS headers, even if downstream
+// middleware (auth, body parsing, DB init) throws an error.
 app.options('*', cors(corsOptions));
+
+// ─── Apply CORS to all other requests ──────────────────────────────────────
+app.use(cors(corsOptions));
+
+// --- Debug Logger ---
+app.use((req, res, next) => {
+  const origin = req.headers.origin || 'NO_ORIGIN';
+  console.log(`[HTTP] ${req.method} ${req.url} | Origin: ${origin}`);
+  next();
+});
 
 app.use(express.json({ limit: '5mb' }));
 
 
 const records = new Map();
 const accessGrants = new Map();
-const fs = require('fs');
-const path = require('path');
 const reportsFile = path.join(__dirname, 'reports.json');
 
 // Initialize reports file if it doesn't exist
@@ -234,7 +216,6 @@ app.delete('/api/records/:code', authMiddleware, async (req, res) => {
 // ---------------------------------------------------------
 // BACKGROUND CRON JOBS
 // ---------------------------------------------------------
-const cron = require('node-cron');
 
 cron.schedule('* * * * *', async () => {
   const now = new Date();
