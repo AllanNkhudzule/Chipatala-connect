@@ -16,7 +16,7 @@ async function authFetch(urlPath: string, options: RequestInit = {}) {
     ...options,
     headers,
     mode: 'cors',
-    credentials: 'include',
+    credentials: 'omit',
   });
   return res;
 }
