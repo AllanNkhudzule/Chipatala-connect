@@ -1,6 +1,5 @@
 require('dotenv').config();
 const express = require('express');
-const cors = require('cors');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const cron = require('node-cron');
@@ -12,62 +11,18 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET;
 
-// --- CORS Configuration ---
-const ALLOWED_ORIGINS = [
-  'https://chipatalaconnect.netlify.app',
-  'https://chipatalaconnect-patient.netlify.app',
-  'http://localhost:5173',
-  'http://localhost:5174',
-  'http://localhost:3001',
-];
-
-// Merge any extra origins from the env var
-if (process.env.ALLOWED_ORIGINS) {
-  process.env.ALLOWED_ORIGINS
-    .split(',')
-    .map(o => o.trim().replace(/^['"]+|['"]+$/g, '').replace(/\/$/, ''))
-    .filter(Boolean)
-    .forEach(o => { if (!ALLOWED_ORIGINS.includes(o)) ALLOWED_ORIGINS.push(o); });
-}
-
-const corsOptions = {
-  origin: (origin, callback) => {
-    if (!origin) {
-      return callback(null, true); // allow server-to-server / Postman / curl
-    }
-    const normalized = origin.replace(/\/$/, '').toLowerCase();
-    const allowed =
-      ALLOWED_ORIGINS.some(o => o.toLowerCase() === normalized) ||
-      normalized.includes('netlify.app') ||
-      normalized.includes('localhost') ||
-      normalized.includes('127.0.0.1');
-
-    if (allowed) {
-      console.log(`[CORS] Accepted: ${origin}`);
-      return callback(null, true);
-    }
-    console.error(`[CORS] Rejected: ${origin}`);
-    return callback(new Error(`CORS: origin ${origin} not allowed`));
-  },
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
-  exposedHeaders: ['Content-Length', 'X-Request-Id'],
-  credentials: true,
-  optionsSuccessStatus: 204,
-};
-
-// ─── PREFLIGHT: must come BEFORE everything else ───────────────────────────
-// This ensures OPTIONS requests always get CORS headers, even if downstream
-// middleware (auth, body parsing, DB init) throws an error.
-app.options('*', cors(corsOptions));
-
-// ─── Apply CORS to all other requests ──────────────────────────────────────
-app.use(cors(corsOptions));
+// ─── Prototype CORS: allow all origins ────────────────────────────────────
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  next();
+});
 
 // --- Debug Logger ---
 app.use((req, res, next) => {
-  const origin = req.headers.origin || 'NO_ORIGIN';
-  console.log(`[HTTP] ${req.method} ${req.url} | Origin: ${origin}`);
+  console.log(`[HTTP] ${req.method} ${req.url} | Origin: ${req.headers.origin || 'server'}`);
   next();
 });
 
