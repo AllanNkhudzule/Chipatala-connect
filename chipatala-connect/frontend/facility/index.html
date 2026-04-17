@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chipatala Connect — Facility Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root{
+    --teal:#0F6E56;--teal-l:#E1F5EE;
+    --blue:#185FA5;--blue-l:#E6F1FB;
+    --purp:#534AB7;--purp-l:#EEEDFE;
+    --amb:#BA7517;--amb-l:#FAEEDA;
+    --red:#A32D2D;--red-l:#FCEBEB;
+    --grn:#3B6D11;--grn-l:#EAF3DE;
+    --gray:#5F5E5A;--gray-l:#F1EFE8;
+    --bg:#f5f4f0;--card:#fff;
+    --text:#1a1a1a;--muted:#6b6b68;
+    --radius:12px;--shadow:0 2px 12px rgba(0,0,0,.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text)}
+  .hidden{display:none!important}
+
+  /* ── Layout ── */
+  .sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:#fff;border-right:1px solid #e8e8e0;display:flex;flex-direction:column;z-index:10}
+  .main{margin-left:220px;min-height:100vh;padding:24px}
+  @media(max-width:700px){.sidebar{width:100%;height:auto;position:relative;flex-direction:row;flex-wrap:wrap;padding:8px}.main{margin-left:0}}
+
+  /* ── Sidebar ── */
+  .logo{padding:20px 16px 14px;border-bottom:1px solid #f0f0ea}
+  .logo-name{font-size:17px;font-weight:700;color:var(--teal)}
+  .logo-sub{font-size:11px;color:var(--muted);margin-top:2px}
+  .facility-selector{padding:12px 16px;border-bottom:1px solid #f0f0ea}
+  .facility-selector label{font-size:11px;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px}
+  .facility-selector select{width:100%;padding:8px 10px;border:2px solid #e0e0d8;border-radius:8px;font-size:13px;background:#fff;outline:none}
+  .facility-selector select:focus{border-color:var(--teal)}
+  .nav-links{flex:1;padding:12px 0}
+  .nav-link{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;border:none;background:none;width:100%;text-align:left;font-size:14px;color:var(--muted);border-radius:0;transition:all .15s}
+  .nav-link:hover{background:var(--gray-l);color:var(--text)}
+  .nav-link.active{background:var(--teal-l);color:var(--teal);font-weight:600}
+  .nav-icon{font-size:18px;width:24px;text-align:center}
+  .sidebar-footer{padding:12px 16px;border-top:1px solid #f0f0ea;font-size:11px;color:var(--muted)}
+
+  /* ── Page header ── */
+  .page-header{margin-bottom:24px}
+  .page-title{font-size:24px;font-weight:700;color:var(--text)}
+  .page-sub{font-size:14px;color:var(--muted);margin-top:4px}
+
+  /* ── Cards ── */
+  .card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+  .card-title{font-size:14px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px}
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px}
+  .stat-card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);border-left:4px solid var(--teal)}
+  .stat-val{font-size:32px;font-weight:700;color:var(--text)}
+  .stat-lbl{font-size:13px;color:var(--muted);margin-top:4px}
+
+  /* ── Search ── */
+  .search-bar{display:flex;gap:10px;margin-bottom:20px}
+  .search-bar input{flex:1;padding:12px 16px;border:2px solid #e0e0d8;border-radius:8px;font-size:15px;outline:none;transition:border-color .2s}
+  .search-bar input:focus{border-color:var(--teal)}
+  .search-bar button{padding:12px 20px;background:var(--teal);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+  .search-bar button:hover{background:#0a5a48}
+
+  /* ── Patient list ── */
+  .patient-row{background:var(--card);border-radius:10px;padding:16px;margin-bottom:10px;box-shadow:var(--shadow);cursor:pointer;transition:transform .1s,box-shadow .1s;display:flex;align-items:center;gap:14px}
+  .patient-row:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.12)}
+  .patient-avatar{width:44px;height:44px;border-radius:50%;background:var(--teal-l);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .patient-info{flex:1}
+  .patient-name{font-size:15px;font-weight:600}
+  .patient-meta{font-size:12px;color:var(--muted);margin-top:2px}
+  .patient-badges{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+  .badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+  .badge-teal{background:var(--teal-l);color:var(--teal)}
+  .badge-blue{background:var(--blue-l);color:var(--blue)}
+  .badge-red{background:var(--red-l);color:var(--red)}
+  .badge-amb{background:var(--amb-l);color:var(--amb)}
+  .badge-gray{background:var(--gray-l);color:var(--gray)}
+  .chevron{color:var(--muted);font-size:20px}
+
+  /* ── Patient detail ── */
+  .detail-header{background:linear-gradient(135deg,var(--teal),#0a4a3a);color:#fff;border-radius:var(--radius);padding:24px;margin-bottom:20px}
+  .detail-name{font-size:24px;font-weight:700}
+  .detail-meta{font-size:14px;opacity:.85;margin-top:4px}
+  .badge-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .badge-white{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;background:rgba(255,255,255,.2);color:#fff}
+  .badge-danger{background:#fff;color:var(--red);padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+  @media(max-width:600px){.two-col{grid-template-columns:1fr}}
+  .info-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f5f5f0}
+  .info-row:last-child{border:none}
+  .info-label{font-size:13px;color:var(--muted)}
+  .info-value{font-size:14px;font-weight:600;text-align:right;max-width:60%}
+  .section-heading{font-size:13px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.6px;margin:20px 0 10px}
+  .pill{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;margin:3px}
+
+  /* ── Consent panel ── */
+  .consent-panel{background:var(--red-l);border:2px solid var(--red);border-radius:var(--radius);padding:20px;margin-bottom:20px}
+  .consent-panel.granted{background:var(--grn-l);border-color:var(--grn)}
+  .consent-title{font-size:16px;font-weight:700;margin-bottom:8px}
+  .consent-title.red{color:var(--red)}
+  .consent-title.grn{color:var(--grn)}
+
+  /* ── Buttons ── */
+  .btn{padding:12px 20px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
+  .btn-teal{background:var(--teal);color:#fff}.btn-teal:hover{background:#0a5a48}
+  .btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{background:#1050a0}
+  .btn-red{background:var(--red);color:#fff}
+  .btn-gray{background:var(--gray-l);color:var(--text)}
+  .btn-sm{padding:8px 14px;font-size:13px}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+
+  /* ── Encounter cards ── */
+  .encounter-card{background:var(--card);border-radius:10px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow);border-left:4px solid var(--teal)}
+  .enc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+  .enc-facility{font-size:14px;font-weight:600;color:var(--teal)}
+  .enc-date{font-size:12px;color:var(--muted)}
+  .enc-reason{font-size:15px;font-weight:600;margin-bottom:6px}
+  .enc-notes{font-size:13px;color:var(--muted);line-height:1.5}
+  .vitals-row{display:flex;gap:12px;margin-top:10px;flex-wrap:wrap}
+  .vital{background:var(--gray-l);border-radius:6px;padding:6px 10px;font-size:12px}
+  .vital-label{color:var(--muted);font-size:11px}
+  .vital-value{font-weight:600}
+  .signed{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--grn);background:var(--grn-l);padding:3px 8px;border-radius:20px;margin-top:8px}
+
+  /* ── Form ── */
+  .form-field{margin-bottom:16px}
+  .form-label{font-size:12px;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px}
+  .form-input{width:100%;padding:12px;border:2px solid #e0e0d8;border-radius:8px;font-size:14px;outline:none;transition:border-color .2s}
+  .form-input:focus{border-color:var(--teal)}
+  textarea.form-input{min-height:100px;resize:vertical}
+
+  /* ── Queue ── */
+  .queue-grid{display:grid;grid-template-columns:1fr 2fr;gap:20px}
+  @media(max-width:700px){.queue-grid{grid-template-columns:1fr}}
+  .current-patient{background:var(--teal);color:#fff;border-radius:var(--radius);padding:24px;text-align:center}
+  .ticket-big{font-size:64px;font-weight:700;line-height:1}
+  .queue-list{list-style:none}
+  .queue-item{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid #f0f0ea}
+  .ticket-num{width:40px;height:40px;border-radius:50%;background:var(--teal-l);color:var(--teal);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex-shrink:0}
+  .queue-name{font-size:14px;font-weight:600}
+  .wait-time{font-size:12px;color:var(--muted);margin-top:2px}
+
+  /* ── DHIS2 ── */
+  .report-table{width:100%;border-collapse:collapse}
+  .report-table th{background:var(--teal-l);color:var(--teal);padding:12px 16px;text-align:left;font-size:13px}
+  .report-table td{padding:12px 16px;border-bottom:1px solid #f0f0ea;font-size:14px}
+  .report-table tr:last-child td{border:none}
+  .report-table td:last-child{font-weight:700;text-align:right}
+  .dhis2-badge{display:inline-block;background:var(--teal-l);color:var(--teal);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
+
+  /* ── Misc ── */
+  .loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--muted)}
+  .spinner{width:28px;height:28px;border:3px solid #e0e0d8;border-top-color:var(--teal);border-radius:50%;animation:spin .8s linear infinite;margin-right:10px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .toast{position:fixed;top:20px;right:20px;background:#1a1a1a;color:#fff;padding:12px 20px;border-radius:8px;font-size:14px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none}
+  .toast.show{opacity:1}
+  .empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+  .empty-icon{font-size:48px;margin-bottom:12px}
+  .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--teal);font-size:14px;font-weight:600;cursor:pointer;margin-bottom:16px;border:none;background:none;padding:0}
+  .back-link:hover{opacity:.7}
+  .alert{padding:14px 16px;border-radius:8px;font-size:14px;margin-bottom:16px}
+  .alert-info{background:var(--blue-l);color:var(--blue)}
+  .alert-success{background:var(--grn-l);color:var(--grn)}
+  .alert-warn{background:var(--amb-l);color:var(--amb)}
+  .qr-scan-area{border:3px dashed #e0e0d8;border-radius:var(--radius);padding:30px;text-align:center;cursor:pointer;transition:border-color .2s;margin-bottom:16px}
+  .qr-scan-area:hover{border-color:var(--teal)}
+  .qr-scan-area .icon{font-size:48px;margin-bottom:8px}
+</style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══════════════════════════════════════════════════════════════ -->
+<div class="sidebar">
+  <div class="logo">
+    <div class="logo-name">🏥 Chipatala Connect</div>
+    <div class="logo-sub">Facility Dashboard</div>
+  </div>
+  <div class="facility-selector">
+    <label>Active Facility</label>
+    <select id="facility-select" onchange="changeFacility()">
+      <option value="">Loading...</option>
+    </select>
+  </div>
+  <div class="nav-links">
+    <button class="nav-link active" onclick="showPage('search')" id="nav-search">
+      <span class="nav-icon">🔍</span> Patient Search
+    </button>
+    <button class="nav-link" onclick="showPage('queue')" id="nav-queue">
+      <span class="nav-icon">📋</span> Queue
+    </button>
+    <button class="nav-link" onclick="showPage('dhis2')" id="nav-dhis2">
+      <span class="nav-icon">📊</span> DHIS2 Report
+    </button>
+    <button class="nav-link" onclick="showPage('crossfacility')" id="nav-crossfacility">
+      <span class="nav-icon">🔗</span> Cross-Facility Demo
+    </button>
+  </div>
+  <div class="sidebar-footer">
+    <div id="facility-name-footer">No facility selected</div>
+    <div style="margin-top:4px">API: <span style="color:var(--teal)" id="api-status">connecting...</span></div>
+  </div>
+</div>
+
+<!-- ══ MAIN CONTENT ══════════════════════════════════════════════════════════ -->
+<div class="main" id="main-area">
+  <div class="loading"><div class="spinner"></div>Loading Chipatala Connect...</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'https://chipatala-connect-d3tx.onrender.com';
+let state = {
+  facilityId: null,
+  facilityKey: null,
+  facilityName: null,
+  facilities: [],
+  currentPatient: null,
+  currentConsent: null,
+  queue: [],
+  page: 'search'
+};
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+async function boot() {
+  try {
+    const [facR, healthR] = await Promise.all([
+      fetch(API+'/facilities'),
+      fetch(API+'/health')
+    ]);
+    state.facilities = await facR.json();
+    const health = await healthR.json();
+
+    // Populate selector
+    const sel = document.getElementById('facility-select');
+    sel.innerHTML = state.facilities.map(f =>
+      `<option value="${f.id}" data-key="${['key-unima-001','key-mzuzu-002','key-rumphi-003'][state.facilities.indexOf(f)]}">${f.name}</option>`
+    ).join('');
+
+    // API key map
+    const keyMap = {'fac-001':'key-unima-001','fac-002':'key-mzuzu-002','fac-003':'key-rumphi-003'};
+    state.facilityId = state.facilities[0].id;
+    state.facilityKey = keyMap[state.facilityId];
+    state.facilityName = state.facilities[0].name;
+    document.getElementById('facility-name-footer').textContent = state.facilityName;
+    document.getElementById('api-status').textContent = `online · ${health.patients} patients`;
+
+    showPage('search');
+  } catch(e) {
+    document.getElementById('main-area').innerHTML = `
+      <div class="card" style="text-align:center;padding:40px;max-width:500px;margin:40px auto">
+        <div style="font-size:48px;margin-bottom:16px">⚠️</div>
+        <div style="font-size:20px;font-weight:700;margin-bottom:8px">Cannot connect to gateway</div>
+        <div style="color:var(--muted);margin-bottom:20px">Make sure the gateway is running:<br><code style="background:var(--gray-l);padding:4px 8px;border-radius:4px">node index.js</code></div>
+        <button class="btn btn-teal" onclick="location.reload()">Retry</button>
+      </div>`;
+  }
+}
+
+function changeFacility() {
+  const keyMap = {'fac-001':'key-unima-001','fac-002':'key-mzuzu-002','fac-003':'key-rumphi-003'};
+  const sel = document.getElementById('facility-select');
+  state.facilityId = sel.value;
+  state.facilityKey = keyMap[state.facilityId];
+  state.facilityName = state.facilities.find(f=>f.id===state.facilityId)?.name;
+  document.getElementById('facility-name-footer').textContent = state.facilityName;
+  showPage(state.page);
+  toast('Switched to '+state.facilityName);
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+function showPage(page) {
+  state.page = page;
+  document.querySelectorAll('.nav-link').forEach(n=>n.classList.remove('active'));
+  const navEl = document.getElementById('nav-'+page);
+  if (navEl) navEl.classList.add('active');
+  const pages = { search: pageSearch, queue: pageQueue, dhis2: pageDHIS2, crossfacility: pageCrossFacility };
+  if (pages[page]) pages[page]();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PAGE: PATIENT SEARCH
+// ══════════════════════════════════════════════════════════════════════════════
+function pageSearch() {
+  document.getElementById('main-area').innerHTML = `
+    <div class="page-header">
+      <div class="page-title">Patient Search</div>
+      <div class="page-sub">Search by name or NRB number · ${state.facilityName}</div>
+    </div>
+    <div class="search-bar">
+      <input id="search-input" placeholder="Patient name or NRB number..." onkeypress="if(event.key==='Enter')doSearch()">
+      <button onclick="doSearch()">Search</button>
+    </div>
+    <div class="alert alert-info">
+      💡 Try searching "Banda", "Phiri", or "Mwale" — or leave blank to browse all 500 patients
+    </div>
+    <div id="search-results">
+      <div class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <div>Search for a patient to get started</div>
+        <button class="btn btn-teal btn-sm" style="margin-top:16px" onclick="doSearch()">Browse All Patients</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('search-input').focus();
+}
+
+async function doSearch() {
+  const q = document.getElementById('search-input')?.value.trim() || '';
+  const res = document.getElementById('search-results');
+  res.innerHTML = '<div class="loading"><div class="spinner"></div>Searching...</div>';
+
+  try {
+    const r = await fetch(API+'/fhir/Patient/search', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-Api-Key':state.facilityKey},
+      body: JSON.stringify({ name: q || undefined, nrb: q.startsWith('MW') ? q : undefined })
+    });
+    const data = await r.json();
+    if (!data.results.length) {
+      res.innerHTML = '<div class="empty-state"><div class="empty-icon">😕</div><div>No patients found</div></div>';
+      return;
+    }
+    res.innerHTML = `
+      <div style="font-size:13px;color:var(--muted);margin-bottom:12px">${data.total} patient${data.total!==1?'s':''} found${data.total>20?' (showing 20)':''}</div>
+      ${data.results.map(p=>`
+        <div class="patient-row" onclick="openPatient('${p.id}')">
+          <div class="patient-avatar">${p.gender==='female'?'👩':'👨'}</div>
+          <div class="patient-info">
+            <div class="patient-name">${p.name}</div>
+            <div class="patient-meta">${p.nrb} · ${p.age}y · ${p.village}</div>
+            <div class="patient-badges">
+              ${p.hasRecordsHere ? '<span class="badge badge-teal">Records here</span>' : '<span class="badge badge-gray">New to this facility</span>'}
+              ${p.conditions.slice(0,2).map(c=>`<span class="badge badge-blue">${c}</span>`).join('')}
+              ${p.lastVisit ? `<span class="badge badge-amb">Last visit: ${p.lastVisit}</span>` : ''}
+            </div>
+          </div>
+          <div class="chevron">›</div>
+        </div>`).join('')}
+    `;
+  } catch(e) { res.innerHTML = '<div class="empty-state">Connection error</div>'; }
+}
+
+// ── Patient detail ────────────────────────────────────────────────────────────
+async function openPatient(patientId) {
+  document.getElementById('main-area').innerHTML = '<div class="loading"><div class="spinner"></div>Loading patient...</div>';
+  state.currentPatient = null;
+  state.currentConsent = null;
+
+  try {
+    // Fetch summary
+    const sumR = await fetch(API+'/fhir/Patient/'+patientId+'/$summary', {
+      headers:{'X-Api-Key':state.facilityKey}
+    });
+    const summary = await sumR.json();
+    state.currentPatient = { ...summary, id: patientId };
+
+    // Check for existing consent
+    const audR = await fetch(API+'/audit/'+patientId, { headers:{'X-Api-Key':state.facilityKey} });
+    const auditData = await audR.json();
+
+    renderPatientDetail(summary, patientId);
+  } catch(e) {
+    document.getElementById('main-area').innerHTML = '<div class="empty-state">Error loading patient</div>';
+  }
+}
+
+function renderPatientDetail(s, patientId) {
+  const p = s.patient;
+  const allergyDanger = s.allergy && s.allergy !== 'None';
+
+  document.getElementById('main-area').innerHTML = `
+    <button class="back-link" onclick="showPage('search')">← Back to search</button>
+
+    <div class="detail-header">
+      <div style="font-size:12px;opacity:.7;margin-bottom:4px">PATIENT</div>
+      <div class="detail-name">${p.name}</div>
+      <div class="detail-meta">NRB: ${p.nrb} · ${p.age}y · ${cap(p.gender)} · ${p.village}</div>
+      <div class="badge-row">
+        <div class="badge-white">🩸 ${p.bloodType}</div>
+        ${allergyDanger ? `<div class="badge-danger">⚠️ Allergy: ${s.allergy}</div>` : '<div class="badge-white">No known allergies</div>'}
+        <div class="badge-white">📍 ${s.primaryFacility}</div>
+      </div>
+    </div>
+
+    <!-- Consent panel -->
+    <div id="consent-panel"></div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">Patient Info</div>
+        <div class="info-row"><span class="info-label">NRB Number</span><span class="info-value">${p.nrb}</span></div>
+        <div class="info-row"><span class="info-label">Date of Birth</span><span class="info-value">${p.dob}</span></div>
+        <div class="info-row"><span class="info-label">Phone</span><span class="info-value">${p.phone}</span></div>
+        <div class="info-row"><span class="info-label">Primary Facility</span><span class="info-value">${s.primaryFacility}</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Clinical Summary</div>
+        <div class="info-row"><span class="info-label">Blood Type</span><span class="info-value">${p.bloodType}</span></div>
+        <div class="info-row"><span class="info-label">Allergy</span><span class="info-value" style="color:${allergyDanger?'var(--red)':'inherit'}">${s.allergy}</span></div>
+        <div style="padding:8px 0">
+          <div class="info-label" style="margin-bottom:6px">Conditions</div>
+          ${s.conditions.length ? s.conditions.map(c=>`<span class="pill" style="background:var(--blue-l);color:var(--blue)">${c.display}</span>`).join('') : '<span style="font-size:13px;color:var(--muted)">None recorded</span>'}
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-title">Current Medications</div>
+      ${s.medications.length ? s.medications.map(m=>`
+        <div class="info-row">
+          <span class="info-label">${m.display}</span>
+          <span class="info-value" style="font-size:12px">${m.dose}</span>
+        </div>`).join('') : '<div style="color:var(--muted);font-size:14px">No active medications</div>'}
+    </div>
+
+    <!-- Full records (shown after consent) -->
+    <div id="full-records-panel"></div>
+
+    <!-- Consultation form -->
+    <div id="consult-panel"></div>
+
+    <!-- Queue checkin -->
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-title">Queue Management</div>
+      <div style="font-size:14px;color:var(--muted);margin-bottom:12px">Add this patient to today's queue</div>
+      <button class="btn btn-blue btn-sm" onclick="checkinPatient('${patientId}')">➕ Check In to Queue</button>
+    </div>
+  `;
+
+  checkConsentAndRender(patientId);
+}
+
+async function checkConsentAndRender(patientId) {
+  // Try to fetch full records — if no consent, show consent panel
+  try {
+    const r = await fetch(API+'/fhir/Patient/'+patientId+'/$everything', {
+      headers:{'X-Api-Key':state.facilityKey,'X-Facility-ID':state.facilityId}
+    });
+    const data = await r.json();
+
+    if (r.status === 403) {
+      // No consent — show request panel
+      document.getElementById('consent-panel').innerHTML = `
+        <div class="consent-panel">
+          <div class="consent-title red">🔒 No Access to Full Records</div>
+          <p style="font-size:14px;margin-bottom:12px">This patient has not granted this facility access to their clinical records. The patient must grant consent via the patient app.</p>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Ask the patient to open their Chipatala Connect app → Access tab → Grant Access to <strong>${state.facilityName}</strong></p>
+          <button class="btn btn-teal btn-sm" onclick="retryConsent('${patientId}')">🔄 Check Again</button>
+        </div>`;
+      showConsultForm(patientId);
+    } else if (r.ok) {
+      // Consent granted — show records
+      state.currentConsent = data.consentId;
+      document.getElementById('consent-panel').innerHTML = `
+        <div class="consent-panel granted" style="margin-bottom:20px">
+          <div class="consent-title grn">✅ Full Records Access Granted</div>
+          <p style="font-size:13px;color:var(--grn)">Scope: ${data.consentScope?.join(', ')} · Consent ID: ${data.consentId?.slice(0,8)}...</p>
+        </div>`;
+      renderFullRecords(data);
+      showConsultForm(patientId);
+    }
+  } catch(e) {
+    document.getElementById('consent-panel').innerHTML = '<div class="alert alert-warn">Could not check consent status</div>';
+  }
+}
+
+function renderFullRecords(data) {
+  const el = document.getElementById('full-records-panel');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="section-heading">Visit History (${data.total} encounters from ${data.accessedBy})</div>
+    ${data.encounters.slice(0,5).map(e=>`
+      <div class="encounter-card">
+        <div class="enc-header">
+          <div>
+            <div class="enc-facility">🏥 ${e.facilityName}</div>
+            <div class="enc-date">${e.date} · ${e.doctor}</div>
+          </div>
+        </div>
+        <div class="enc-reason">${e.reason}</div>
+        <div class="enc-notes">${e.notes}</div>
+        ${Object.keys(e.vitals||{}).length ? `
+          <div class="vitals-row">
+            ${e.vitals.bp?`<div class="vital"><div class="vital-label">BP</div><div class="vital-value">${e.vitals.bp}</div></div>`:''}
+            ${e.vitals.temp?`<div class="vital"><div class="vital-label">Temp</div><div class="vital-value">${e.vitals.temp}°C</div></div>`:''}
+            ${e.vitals.pulse?`<div class="vital"><div class="vital-label">Pulse</div><div class="vital-value">${e.vitals.pulse} bpm</div></div>`:''}
+            ${e.vitals.weight?`<div class="vital"><div class="vital-label">Weight</div><div class="vital-value">${e.vitals.weight}</div></div>`:''}
+          </div>` : ''}
+        ${e.labResults?.length ? `<div style="margin-top:8px">${e.labResults.map(l=>`<span class="pill" style="background:var(--blue-l);color:var(--blue)">🔬 ${l.test}: ${l.result}</span>`).join('')}</div>` : ''}
+        ${e.signed ? '<div class="signed">✓ Signed by facility</div>' : ''}
+      </div>`).join('')}
+  `;
+}
+
+async function retryConsent(patientId) {
+  toast('Checking consent...');
+  await checkConsentAndRender(patientId);
+}
+
+function showConsultForm(patientId) {
+  const el = document.getElementById('consult-panel');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="card">
+      <div class="card-title">New Consultation</div>
+      <div class="form-field">
+        <label class="form-label">Doctor</label>
+        <input class="form-input" id="cf-doctor" placeholder="Dr. Banda" value="Dr. ${['Banda','Phiri','Gondwe','Mwale'][Math.floor(Math.random()*4)]}">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Reason for Visit</label>
+        <input class="form-input" id="cf-reason" placeholder="e.g. Hypertension follow-up, Malaria symptoms">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Clinical Notes</label>
+        <textarea class="form-input" id="cf-notes" placeholder="Patient presented with... Examination findings..."></textarea>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+        <div class="form-field" style="margin:0">
+          <label class="form-label">Blood Pressure</label>
+          <input class="form-input" id="cf-bp" placeholder="120/80">
+        </div>
+        <div class="form-field" style="margin:0">
+          <label class="form-label">Temperature (°C)</label>
+          <input class="form-input" id="cf-temp" placeholder="36.8">
+        </div>
+      </div>
+      <button class="btn btn-teal" onclick="saveEncounter('${patientId}')">💾 Save Consultation</button>
+    </div>
+  `;
+}
+
+async function saveEncounter(patientId) {
+  const body = {
+    patient_id: patientId,
+    facility_id: state.facilityId,
+    doctor: document.getElementById('cf-doctor')?.value,
+    reason: document.getElementById('cf-reason')?.value || 'General consultation',
+    notes: document.getElementById('cf-notes')?.value,
+    vitals: {
+      bp: document.getElementById('cf-bp')?.value,
+      temp: document.getElementById('cf-temp')?.value,
+    }
+  };
+  try {
+    const r = await fetch(API+'/fhir/Encounter', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-Api-Key':state.facilityKey},
+      body: JSON.stringify(body)
+    });
+    const d = await r.json();
+    if (r.ok) toast('✓ Consultation saved and signed by '+state.facilityName);
+    else toast('Error: '+d.error);
+  } catch(e) { toast('Connection error'); }
+}
+
+async function checkinPatient(patientId) {
+  try {
+    const r = await fetch(API+'/queue/checkin', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ patient_id: patientId, facility_id: state.facilityId })
+    });
+    const d = await r.json();
+    if (r.ok) { toast(`✓ Ticket #${d.ticketNum} issued`); }
+  } catch(e) { toast('Connection error'); }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PAGE: QUEUE
+// ══════════════════════════════════════════════════════════════════════════════
+async function pageQueue() {
+  document.getElementById('main-area').innerHTML = `
+    <div class="page-header">
+      <div class="page-title">Queue Management</div>
+      <div class="page-sub">${state.facilityName} · Live patient flow</div>
+    </div>
+    <div id="queue-content"><div class="loading"><div class="spinner"></div>Loading queue...</div></div>
+  `;
+  await loadQueue();
+}
+
+async function loadQueue() {
+  try {
+    const r = await fetch(API+'/queue/'+state.facilityId);
+    const data = await r.json();
+    const el = document.getElementById('queue-content');
+    if (!el) return;
+
+    const statsHtml = `
+      <div class="stat-grid">
+        <div class="stat-card" style="border-color:var(--teal)"><div class="stat-val">${data.waiting?.length||0}</div><div class="stat-lbl">Waiting</div></div>
+        <div class="stat-card" style="border-color:var(--grn)"><div class="stat-val">${data.seenToday||0}</div><div class="stat-lbl">Seen Today</div></div>
+        <div class="stat-card" style="border-color:var(--amb)"><div class="stat-val">${data.avgWaitMinutes||0}</div><div class="stat-lbl">Avg Wait (min)</div></div>
+      </div>`;
+
+    const currentHtml = `
+      <div class="queue-grid" style="margin-bottom:20px">
+        <div>
+          <div class="current-patient">
+            <div style="font-size:13px;opacity:.8;margin-bottom:4px">NOW SERVING</div>
+            <div class="ticket-big">${data.currentTicket||'—'}</div>
+            <div style="font-size:15px;margin-top:8px;opacity:.9">${data.currentPatient||'No patient called'}</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Waiting</div>
+          <ul class="queue-list">
+            ${data.waiting?.length ? data.waiting.map(q=>`
+              <li class="queue-item">
+                <div class="ticket-num">${q.ticketNum}</div>
+                <div style="flex:1">
+                  <div class="queue-name">${q.patientName}</div>
+                  <div class="wait-time">Waiting ${q.waitMinutes} min</div>
+                </div>
+                <button class="btn btn-teal btn-sm" onclick="callTicket('${q.id}')">Call</button>
+              </li>`).join('') : '<li style="color:var(--muted);padding:20px;text-align:center">No patients waiting</li>'}
+          </ul>
+        </div>
+      </div>`;
+
+    el.innerHTML = statsHtml + currentHtml + `
+      <button class="btn btn-gray" onclick="pageQueue()">🔄 Refresh Queue</button>
+    `;
+  } catch(e) {
+    document.getElementById('queue-content').innerHTML = '<div class="empty-state">Error loading queue</div>';
+  }
+}
+
+async function callTicket(ticketId) {
+  await fetch(API+'/queue/'+ticketId+'/call', { method:'POST' });
+  toast('Patient called');
+  await loadQueue();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PAGE: DHIS2 REPORT
+// ══════════════════════════════════════════════════════════════════════════════
+async function pageDHIS2() {
+  document.getElementById('main-area').innerHTML = `
+    <div class="page-header">
+      <div class="page-title">DHIS2 Report</div>
+      <div class="page-sub">Auto-generated from encounter data · No manual tallying needed</div>
+    </div>
+    <div class="alert alert-info">
+      📊 This report is auto-generated from all encounters recorded at <strong>${state.facilityName}</strong>. 
+      It replaces the manual Friday afternoon register count that nurses currently spend 2–3 hours on.
+    </div>
+    <div id="dhis2-content"><div class="loading"><div class="spinner"></div>Generating report...</div></div>
+  `;
+  await loadDHIS2();
+}
+
+async function loadDHIS2() {
+  try {
+    const r = await fetch(API+'/dhis2/report/'+state.facilityId);
+    const data = await r.json();
+    const el = document.getElementById('dhis2-content');
+
+    const labelMap = {
+      OPD_TOTAL_ATTENDANCE:'Total OPD Attendance',
+      OPD_UNDER_5:'Under 5 Attendance',
+      OPD_MALARIA_CONFIRMED:'Confirmed Malaria Cases',
+      ANC_VISITS:'ANC Visits',
+      HIV_PATIENTS_ON_ART:'HIV Patients on ART',
+      HYPERTENSION_MANAGED:'Hypertension Cases Managed',
+      OPD_DIABETES_MANAGED:'Diabetes Cases Managed',
+      TOTAL_ADMISSIONS:'Total Admissions',
+    };
+
+    el.innerHTML = `
+      <div class="card" style="margin-bottom:20px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
+          <div>
+            <div class="card-title">Ministry of Health — OPD Monthly Report</div>
+            <div style="font-size:15px;font-weight:700">${data.facilityName}</div>
+            <div style="font-size:13px;color:var(--muted)">DHIS2 Org Unit: ${data.orgUnit} · Period: ${data.period}</div>
+          </div>
+          <div class="dhis2-badge">DHIS2 Ready</div>
+        </div>
+        <table class="report-table">
+          <thead><tr><th>Data Element</th><th>DHIS2 Code</th><th style="text-align:right">Value</th></tr></thead>
+          <tbody>
+            ${data.dataValues.map(dv=>`
+              <tr>
+                <td>${labelMap[dv.dataElement]||dv.dataElement}</td>
+                <td style="font-size:12px;color:var(--muted)">${dv.dataElement}</td>
+                <td>${dv.value}</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="two-col">
+        <div class="stat-card" style="border-color:var(--teal)">
+          <div class="stat-val">${data.summary.totalEncountersLast30Days}</div>
+          <div class="stat-lbl">Encounters (last 30 days)</div>
+        </div>
+        <div class="stat-card" style="border-color:var(--blue)">
+          <div class="stat-val">${data.summary.avgEncountersPerDay}</div>
+          <div class="stat-lbl">Avg encounters/day</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:20px">
+        <div class="card-title">DHIS2 API Payload (ready to POST)</div>
+        <pre style="background:var(--gray-l);padding:16px;border-radius:8px;font-size:12px;overflow-x:auto;white-space:pre-wrap">${JSON.stringify({dataSet:data.dataSet,orgUnit:data.orgUnit,period:data.period,dataValues:data.dataValues},null,2)}</pre>
+        <div style="margin-top:12px;font-size:13px;color:var(--muted)">
+          Generated: ${new Date(data.generatedAt).toLocaleString()} · ${data.generatedBy}
+        </div>
+      </div>
+    `;
+  } catch(e) {
+    document.getElementById('dhis2-content').innerHTML = '<div class="empty-state">Error generating report</div>';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PAGE: CROSS-FACILITY DEMO
+// ══════════════════════════════════════════════════════════════════════════════
+function pageCrossFacility() {
+  document.getElementById('main-area').innerHTML = `
+    <div class="page-header">
+      <div class="page-title">Cross-Facility Demo</div>
+      <div class="page-sub">Demonstrate the consent-gated record sharing between facilities</div>
+    </div>
+    <div class="alert alert-info">
+      🎯 <strong>Demo script:</strong> This page shows what happens when a patient visits a new facility. 
+      You are currently logged in as <strong>${state.facilityName}</strong>. 
+      Search for a patient, then try to access their records from another facility.
+    </div>
+
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-title">Step 1 — Find a Patient with Records at Another Facility</div>
+      <div style="font-size:14px;color:var(--muted);margin-bottom:16px">
+        Search for a patient who has visited a different facility. 
+        ~155 patients in the system have visited multiple facilities.
+      </div>
+      <div class="search-bar">
+        <input id="cf-search" placeholder="Patient name or NRB..." onkeypress="if(event.key==='Enter')doCrossSearch()">
+        <button onclick="doCrossSearch()">Find Cross-Facility Patient</button>
+      </div>
+      <div id="cf-results"></div>
+    </div>
+
+    <div id="cf-detail"></div>
+  `;
+}
+
+async function doCrossSearch() {
+  const q = document.getElementById('cf-search')?.value.trim() || '';
+  const el = document.getElementById('cf-results');
+  el.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+  try {
+    // Search all patients, show those with multiple facilities
+    const r = await fetch(API+'/fhir/Patient/search', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-Api-Key':state.facilityKey},
+      body: JSON.stringify({ name: q || undefined })
+    });
+    const data = await r.json();
+    // Filter to patients not primarily at this facility for demo
+    const crossFac = data.results.filter(p => !p.hasRecordsHere).slice(0,8);
+
+    if (!crossFac.length) {
+      el.innerHTML = '<div style="color:var(--muted);padding:16px">Try searching "Banda" or leave blank to see all</div>';
+      return;
+    }
+    el.innerHTML = crossFac.map(p=>`
+      <div class="patient-row" onclick="openCrossPatient('${p.id}','${p.name}')">
+        <div class="patient-avatar">${p.gender==='female'?'👩':'👨'}</div>
+        <div class="patient-info">
+          <div class="patient-name">${p.name}</div>
+          <div class="patient-meta">${p.nrb} · ${p.age}y · Records at: ${p.primaryFacility}</div>
+        </div>
+        <div class="chevron">›</div>
+      </div>`).join('');
+  } catch(e) { el.innerHTML = '<div style="color:var(--muted)">Error</div>'; }
+}
+
+async function openCrossPatient(patientId, name) {
+  const el = document.getElementById('cf-detail');
+  el.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
+
+  try {
+    const r = await fetch(API+'/fhir/Patient/'+patientId+'/$everything', {
+      headers:{'X-Api-Key':state.facilityKey,'X-Facility-ID':state.facilityId}
+    });
+    const data = await r.json();
+
+    if (r.status === 403) {
+      el.innerHTML = `
+        <div class="card">
+          <div class="card-title">Step 2 — Access Blocked (as expected)</div>
+          <div class="consent-panel">
+            <div class="consent-title red">🔒 ${data.message}</div>
+            <p style="font-size:14px;margin:12px 0">This is correct behaviour. <strong>${name}</strong> has not granted <strong>${state.facilityName}</strong> access to their records.</p>
+            <p style="font-size:13px;color:var(--muted)">To grant access: Patient opens their app → Access tab → Grant access to ${state.facilityName}</p>
+          </div>
+          <div class="card-title" style="margin-top:20px">Step 3 — Simulate Patient Granting Consent</div>
+          <p style="font-size:14px;color:var(--muted);margin-bottom:16px">
+            In the real system, the patient does this on their phone. For the demo, you can simulate it here:
+          </p>
+          <button class="btn btn-teal" onclick="simulateConsent('${patientId}','${name}')">
+            ✅ Simulate: Patient grants consent to ${state.facilityName}
+          </button>
+        </div>`;
+    } else if (r.ok) {
+      el.innerHTML = `
+        <div class="card">
+          <div class="card-title">Step 2 — Access Granted ✅</div>
+          <div class="consent-panel granted" style="margin-bottom:20px">
+            <div class="consent-title grn">✅ Records received from another facility</div>
+            <p style="font-size:13px;color:var(--grn)">Patient consented · Scope: ${data.consentScope?.join(', ')}</p>
+          </div>
+          ${renderFullRecordsHTML(data)}
+          <div style="margin-top:20px;padding-top:20px;border-top:1px solid #f0f0ea">
+            <div class="card-title">Step 4 — Demonstrate Revocation</div>
+            <p style="font-size:14px;color:var(--muted);margin-bottom:12px">The patient can revoke access at any time. After revocation, this query will return 403.</p>
+            <button class="btn btn-red btn-sm" onclick="openPatient('${patientId}')">Open Patient (to show revoke)</button>
+          </div>
+        </div>`;
+    }
+  } catch(e) { el.innerHTML = '<div class="empty-state">Error</div>'; }
+}
+
+async function simulateConsent(patientId, name) {
+  // Use patient's own token — we'll simulate by directly calling the grant endpoint
+  // For demo: use a test mechanism
+  try {
+    // First identify patient with demo PIN
+    const db = await fetch(API+'/fhir/Patient/search', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-Api-Key':state.facilityKey},
+      body: JSON.stringify({})
+    });
+    const allPats = await db.json();
+    const pat = allPats.results.find(p=>p.id===patientId);
+    if (!pat) { toast('Could not find patient NRB'); return; }
+
+    const authR = await fetch(API+'/auth/identify', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ nrb_number: pat.nrb, pin: '1234' })
+    });
+    const authData = await authR.json();
+    if (!authR.ok) { toast('Could not verify patient identity'); return; }
+
+    const conR = await fetch(API+'/consent', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+authData.session_token},
+      body: JSON.stringify({
+        requesting_facility_id: state.facilityId,
+        scope: ['encounters','conditions','medications'],
+        purpose: 'Cross-facility referral (simulated)'
+      })
+    });
+    const conData = await conR.json();
+    if (conR.ok) {
+      toast('✅ Consent granted by '+name);
+      await openCrossPatient(patientId, name);
+    }
+  } catch(e) { toast('Error simulating consent'); }
+}
+
+function renderFullRecordsHTML(data) {
+  return `
+    <div class="section-heading">Records received from ${data.accessedBy}</div>
+    ${data.encounters.slice(0,3).map(e=>`
+      <div class="encounter-card">
+        <div class="enc-header">
+          <div><div class="enc-facility">🏥 ${e.facilityName}</div><div class="enc-date">${e.date} · ${e.doctor}</div></div>
+        </div>
+        <div class="enc-reason">${e.reason}</div>
+        ${e.signed ? '<div class="signed">✓ Cryptographically signed by facility</div>' : ''}
+      </div>`).join('')}
+  `;
+}
+
+// ── Utils ─────────────────────────────────────────────────────────────────────
+function cap(s) { return s ? s[0].toUpperCase()+s.slice(1) : ''; }
+function toast(msg, dur=3000) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),dur);
+}
+
+boot();
+</script>
+</body>
+</html>

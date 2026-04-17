@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: chipatala-connect-server
+    env: node
+    region: ohio
+    plan: free
+    rootDir: backend
+    startCommand: node index.js
+    buildCommand: npm run seed
+    envVars:
+      - key: NODE_ENV
+        value: production

@@ -1,0 +1,11 @@
+{
+  "name": "chipatala-connect-gateway",
+  "version": "1.0.0",
+  "description": "Chipatala Connect Gateway — zero npm dependencies",
+  "main": "index.js",
+  "scripts": {
+    "seed": "node db/seed.js",
+    "start": "node index.js"
+  },
+  "engines": { "node": ">=18" }
+}
