@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UNMAID — My Card</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="top-bar">
+  <h1>UNMAID</h1>
+  <span id="top-name"></span>
+</div>
+
+<div class="tab-bar">
+  <button class="active" onclick="showSection('card')">My Card</button>
+  <button onclick="showSection('records')">Records</button>
+  <button onclick="showSection('share')">Share</button>
+</div>
+
+<!-- MY CARD -->
+<div id="section-card" class="card">
+  <div class="card-header">
+    <div class="avatar" id="avatar">?</div>
+    <div class="card-header-info">
+      <h2 id="p-name">Loading...</h2>
+      <p id="p-student-id"></p>
+      <span class="badge" id="p-institution">University of Malawi</span>
+    </div>
+  </div>
+
+  <div class="section-title">Identity</div>
+  <div class="field-row"><span class="label">Date of Birth</span><span class="value" id="p-dob">—</span></div>
+  <div class="field-row"><span class="label">Gender</span><span class="value" id="p-gender">—</span></div>
+  <div class="field-row"><span class="label">Phone</span><span class="value" id="p-phone">—</span></div>
+  <div class="field-row"><span class="label">Insurance ID</span><span class="value" id="p-insurance">—</span></div>
+
+  <div class="section-title">Health Info</div>
+  <div class="field-row"><span class="label">Blood Type</span><span class="value" id="p-blood">—</span></div>
+  <div class="field-row"><span class="label">Allergies</span><span class="value" id="p-allergies">None</span></div>
+
+  <button class="btn secondary" onclick="logout()" style="margin-top:24px;">Logout</button>
+</div>
+
+<!-- RECORDS -->
+<div id="section-records" class="card hidden">
+  <div class="section-title">Visit History</div>
+  <div id="records-list"><p style="color:#aaa;font-size:0.85rem;">Loading records...</p></div>
+</div>
+
+<!-- SHARE -->
+<div id="section-share" class="card hidden">
+  <div class="section-title">Share My Health Data</div>
+  <p style="font-size:0.82rem;color:#666;margin-bottom:14px;">Generate a temporary code or QR for a facility to scan and access your data.</p>
+
+  <label>Expires in</label>
+  <select id="expire-select">
+    <option value="15">15 minutes</option>
+    <option value="30" selected>30 minutes</option>
+    <option value="60">1 hour</option>
+    <option value="480">8 hours</option>
+  </select>
+
+  <label>Include identity (name, student ID)?</label>
+  <select id="include-identity">
+    <option value="true">Yes — include my identity</option>
+    <option value="false">No — health data only</option>
+  </select>
+
+  <button class="btn" onclick="generateToken()">Generate Code & QR</button>
+
+  <div id="token-result" class="hidden">
+    <div class="qr-box">
+      <p style="font-size:0.78rem;color:#888;">Access Code</p>
+      <div class="access-code" id="access-code-display"></div>
+      <canvas id="qr-canvas"></canvas>
+      <p class="timer" id="token-timer"></p>
+    </div>
+    <p style="font-size:0.75rem;color:#aaa;margin-top:10px;text-align:center;">Show this QR or code to the facility. It expires automatically.</p>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+  const API = 'http://localhost:3000/api';
+  const token = localStorage.getItem('token');
+  if (!token) window.location = 'index.html';
+
+  let patient = {};
+
+  async function loadCard() {
+    const res = await fetch(`${API}/patients/me`, { headers: { Authorization: `Bearer ${token}` } });
+    patient = await res.json();
+    document.getElementById('top-name').textContent = patient.full_name?.split(' ')[0] || '';
+    document.getElementById('p-name').textContent = patient.full_name || '—';
+    document.getElementById('p-student-id').textContent = patient.student_id || '—';
+    document.getElementById('p-institution').textContent = patient.institution || 'University of Malawi';
+    document.getElementById('p-dob').textContent = patient.date_of_birth ? patient.date_of_birth.split('T')[0] : '—';
+    document.getElementById('p-gender').textContent = patient.gender || '—';
+    document.getElementById('p-phone').textContent = patient.phone || '—';
+    document.getElementById('p-insurance').textContent = patient.insurance_id || '—';
+    document.getElementById('p-blood').textContent = patient.blood_type || '—';
+    document.getElementById('p-allergies').textContent = patient.allergies || 'None';
+    document.getElementById('avatar').textContent = (patient.full_name || '?')[0].toUpperCase();
+  }
+
+  async function loadRecords() {
+    const res = await fetch(`${API}/records/mine`, { headers: { Authorization: `Bearer ${token}` } });
+    const records = await res.json();
+    const container = document.getElementById('records-list');
+    if (!records.length) { container.innerHTML = '<p style="color:#aaa;font-size:0.85rem;">No records yet.</p>'; return; }
+    container.innerHTML = records.map(r => `
+      <div class="record-card">
+        <div class="date">${r.visit_date ? r.visit_date.split('T')[0] : '—'}</div>
+        <div class="facility">${r.facility_name || 'Unknown Facility'}</div>
+        <div class="diagnosis"><strong>Diagnosis:</strong> ${r.diagnosis || '—'}</div>
+        <div class="meds"><strong>Medications:</strong> ${r.medications || '—'}</div>
+        ${r.hiv_status ? `<div class="meds"><strong>HIV:</strong> ${r.hiv_status}</div>` : ''}
+        ${r.tb_status ? `<div class="meds"><strong>TB:</strong> ${r.tb_status}</div>` : ''}
+        ${r.other_conditions ? `<div class="meds"><strong>Other:</strong> ${r.other_conditions}</div>` : ''}
+        ${r.doctor_name ? `<div class="meds" style="margin-top:6px;color:#999;">Dr. ${r.doctor_name}</div>` : ''}
+      </div>
+    `).join('');
+  }
+
+  async function generateToken() {
+    const expires_in_minutes = parseInt(document.getElementById('expire-select').value);
+    const include_identity = document.getElementById('include-identity').value === 'true';
+
+    const res = await fetch(`${API}/facilities/generate-token`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ scope: 'full', include_identity, expires_in_minutes })
+    });
+    const data = await res.json();
+
+    document.getElementById('access-code-display').textContent = data.token;
+    document.getElementById('token-result').classList.remove('hidden');
+
+    document.getElementById('qr-canvas').innerHTML = '';
+    new QRCode(document.getElementById('qr-canvas'), {
+      text: data.token,
+      width: 180,
+      height: 180,
+      colorDark: '#003366',
+      colorLight: '#ffffff',
+    });
+
+    const expiry = new Date(data.expires_at);
+    document.getElementById('token-timer').textContent = `Expires at ${expiry.toLocaleTimeString()}`;
+  }
+
+  function showSection(name) {
+    ['card', 'records', 'share'].forEach(s => {
+      document.getElementById(`section-${s}`).classList.toggle('hidden', s !== name);
+    });
+    document.querySelectorAll('.tab-bar button').forEach((b, i) => {
+      b.classList.toggle('active', ['card','records','share'][i] === name);
+    });
+    if (name === 'records') loadRecords();
+  }
+
+  function logout() {
+    localStorage.clear();
+    window.location = 'index.html';
+  }
+
+  loadCard();
+</script>
+</body>
+</html>

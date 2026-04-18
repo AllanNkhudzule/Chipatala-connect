@@ -1,0 +1,197 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #f0f2f5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.top-bar {
+  width: 100%;
+  background: #003366;
+  color: white;
+  padding: 14px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.top-bar h1 { font-size: 1.1rem; letter-spacing: 2px; }
+.top-bar span { font-size: 0.75rem; opacity: 0.8; }
+
+.card {
+  background: white;
+  border-radius: 16px;
+  width: 95%;
+  max-width: 420px;
+  margin: 20px auto;
+  padding: 24px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #003366;
+  padding-bottom: 16px;
+}
+
+.avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #003366;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.card-header-info h2 { font-size: 1rem; color: #003366; }
+.card-header-info p { font-size: 0.78rem; color: #666; margin-top: 2px; }
+.badge {
+  display: inline-block;
+  background: #e8f0fe;
+  color: #003366;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+.section-title {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #999;
+  margin: 18px 0 8px;
+}
+
+.field-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 0.85rem;
+}
+
+.field-row .label { color: #888; }
+.field-row .value { font-weight: 600; color: #222; text-align: right; max-width: 60%; }
+
+.record-card {
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 10px;
+  background: #fafafa;
+}
+
+.record-card .date { font-size: 0.72rem; color: #999; margin-bottom: 6px; }
+.record-card .facility { font-size: 0.78rem; color: #003366; font-weight: 600; margin-bottom: 8px; }
+.record-card .diagnosis { font-size: 0.85rem; color: #222; margin-bottom: 4px; }
+.record-card .meds { font-size: 0.78rem; color: #555; }
+
+.btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  background: #003366;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 12px;
+  text-align: center;
+  text-decoration: none;
+  letter-spacing: 0.5px;
+}
+
+.btn:hover { background: #004488; }
+.btn.secondary { background: white; color: #003366; border: 2px solid #003366; }
+.btn.danger { background: #cc0000; }
+
+input, select, textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  margin-top: 6px;
+  outline: none;
+  font-family: inherit;
+}
+
+input:focus, select:focus, textarea:focus { border-color: #003366; }
+
+label { font-size: 0.8rem; color: #555; display: block; margin-top: 14px; }
+
+.logo-area {
+  text-align: center;
+  padding: 40px 20px 20px;
+}
+
+.logo-area h1 { font-size: 2.2rem; color: #003366; letter-spacing: 4px; font-weight: 800; }
+.logo-area p { color: #888; font-size: 0.82rem; margin-top: 6px; }
+
+.qr-box {
+  text-align: center;
+  padding: 20px;
+  background: #f8f8f8;
+  border-radius: 12px;
+  margin-top: 16px;
+}
+
+.access-code {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: 6px;
+  color: #003366;
+  margin: 10px 0;
+}
+
+.timer { font-size: 0.78rem; color: #999; }
+
+.tab-bar {
+  display: flex;
+  width: 95%;
+  max-width: 420px;
+  margin: 0 auto 10px;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+}
+
+.tab-bar button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  background: white;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: #888;
+}
+
+.tab-bar button.active {
+  background: #003366;
+  color: white;
+  font-weight: 600;
+}
+
+.error { color: #cc0000; font-size: 0.8rem; margin-top: 8px; text-align: center; }
+.success { color: #006600; font-size: 0.8rem; margin-top: 8px; text-align: center; }
+
+.hidden { display: none; }
+
+canvas { max-width: 200px; margin: 10px auto; display: block; }

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UNMAID</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="logo-area">
+  <h1>UNMAID</h1>
+  <p>University of Malawi Digital Health Card</p>
+</div>
+
+<div class="card">
+  <div class="tab-bar">
+    <button class="active" onclick="showTab('login')">Login</button>
+    <button onclick="showTab('register')">Register</button>
+  </div>
+
+  <!-- LOGIN -->
+  <div id="login-tab">
+    <label>Student ID</label>
+    <input id="login-id" type="text" placeholder="e.g. 2021/CS/001">
+    <label>Password</label>
+    <input id="login-pass" type="password" placeholder="Your password">
+    <button class="btn" onclick="loginPatient()">Login as Student</button>
+    <button class="btn secondary" onclick="window.location='facility.html'">I am a Facility</button>
+    <p class="error hidden" id="login-err"></p>
+  </div>
+
+  <!-- REGISTER -->
+  <div id="register-tab" class="hidden">
+    <label>Full Name</label>
+    <input id="reg-name" type="text" placeholder="Your full name">
+    <label>Student ID</label>
+    <input id="reg-id" type="text" placeholder="e.g. 2021/CS/001">
+    <label>Email</label>
+    <input id="reg-email" type="email" placeholder="your@email.com">
+    <label>Phone</label>
+    <input id="reg-phone" type="tel" placeholder="+265...">
+    <label>Date of Birth</label>
+    <input id="reg-dob" type="date">
+    <label>Gender</label>
+    <select id="reg-gender">
+      <option value="">Select</option>
+      <option>Male</option>
+      <option>Female</option>
+      <option>Other</option>
+    </select>
+    <label>Blood Type</label>
+    <select id="reg-blood">
+      <option value="">Select</option>
+      <option>A+</option><option>A-</option>
+      <option>B+</option><option>B-</option>
+      <option>AB+</option><option>AB-</option>
+      <option>O+</option><option>O-</option>
+    </select>
+    <label>Allergies (if any)</label>
+    <input id="reg-allergies" type="text" placeholder="e.g. Penicillin, Pollen">
+    <label>UniMaid Insurance ID (if any)</label>
+    <input id="reg-insurance" type="text" placeholder="Insurance number">
+    <label>Password</label>
+    <input id="reg-pass" type="password" placeholder="Create a password">
+    <button class="btn" onclick="registerPatient()">Create My Card</button>
+    <p class="error hidden" id="reg-err"></p>
+  </div>
+</div>
+
+<script>
+  const API = 'http://localhost:3000/api';
+
+  function showTab(tab) {
+    document.getElementById('login-tab').classList.toggle('hidden', tab !== 'login');
+    document.getElementById('register-tab').classList.toggle('hidden', tab !== 'register');
+    document.querySelectorAll('.tab-bar button').forEach((b, i) => {
+      b.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'register' && i === 1));
+    });
+  }
+
+  async function loginPatient() {
+    const student_id = document.getElementById('login-id').value.trim();
+    const password = document.getElementById('login-pass').value;
+    try {
+      const res = await fetch(`${API}/auth/patient/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ student_id, password })
+      });
+      const data = await res.json();
+      if (!res.ok) { document.getElementById('login-err').textContent = data.error; document.getElementById('login-err').classList.remove('hidden'); return; }
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('name', data.name);
+      window.location = 'card.html';
+    } catch (e) {
+      document.getElementById('login-err').textContent = 'Cannot reach server';
+      document.getElementById('login-err').classList.remove('hidden');
+    }
+  }
+
+  async function registerPatient() {
+    const body = {
+      full_name: document.getElementById('reg-name').value.trim(),
+      student_id: document.getElementById('reg-id').value.trim(),
+      email: document.getElementById('reg-email').value.trim(),
+      phone: document.getElementById('reg-phone').value.trim(),
+      date_of_birth: document.getElementById('reg-dob').value,
+      gender: document.getElementById('reg-gender').value,
+      blood_type: document.getElementById('reg-blood').value,
+      allergies: document.getElementById('reg-allergies').value.trim(),
+      insurance_id: document.getElementById('reg-insurance').value.trim(),
+      password: document.getElementById('reg-pass').value,
+    };
+    try {
+      const res = await fetch(`${API}/auth/patient/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      if (!res.ok) { document.getElementById('reg-err').textContent = data.error; document.getElementById('reg-err').classList.remove('hidden'); return; }
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('name', data.name);
+      window.location = 'card.html';
+    } catch (e) {
+      document.getElementById('reg-err').textContent = 'Cannot reach server';
+      document.getElementById('reg-err').classList.remove('hidden');
+    }
+  }
+</script>
+</body>
+</html>

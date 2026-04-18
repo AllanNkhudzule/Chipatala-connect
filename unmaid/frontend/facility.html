@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UNMAID — Facility</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="top-bar">
+  <h1>UNMAID</h1>
+  <span id="facility-name"></span>
+</div>
+
+<!-- LOGIN -->
+<div id="facility-login" class="card">
+  <div class="section-title">Facility Login</div>
+  <label>Facility Email</label>
+  <input id="f-email" type="email" placeholder="clinic@example.com">
+  <label>Password</label>
+  <input id="f-pass" type="password" placeholder="Password">
+  <button class="btn" onclick="facilityLogin()">Login</button>
+  <p class="error hidden" id="f-err"></p>
+</div>
+
+<!-- DASHBOARD -->
+<div id="facility-dashboard" class="hidden">
+
+  <div class="tab-bar">
+    <button class="active" onclick="showFTab('scan')">Scan Patient</button>
+    <button onclick="showFTab('write')">Write Record</button>
+  </div>
+
+  <!-- SCAN -->
+  <div id="ftab-scan" class="card">
+    <div class="section-title">Enter Patient Code</div>
+    <p style="font-size:0.82rem;color:#666;margin-bottom:12px;">Type the access code from the patient's phone, or scan the QR.</p>
+    <input id="scan-code" type="text" placeholder="e.g. A3B9X2KZ" style="text-transform:uppercase;letter-spacing:3px;font-size:1.1rem;text-align:center;">
+    <button class="btn" onclick="readPatient()">Fetch Patient Data</button>
+    <p class="error hidden" id="scan-err"></p>
+
+    <div id="patient-result" class="hidden">
+      <!-- Identity -->
+      <div id="identity-section">
+        <div class="section-title">Patient Identity</div>
+        <div class="field-row"><span class="label">Name</span><span class="value" id="r-name">—</span></div>
+        <div class="field-row"><span class="label">Student ID</span><span class="value" id="r-sid">—</span></div>
+        <div class="field-row"><span class="label">DOB</span><span class="value" id="r-dob">—</span></div>
+        <div class="field-row"><span class="label">Gender</span><span class="value" id="r-gender">—</span></div>
+        <div class="field-row"><span class="label">Insurance</span><span class="value" id="r-insurance">—</span></div>
+      </div>
+
+      <div class="section-title">Health Summary</div>
+      <div class="field-row"><span class="label">Blood Type</span><span class="value" id="r-blood">—</span></div>
+      <div class="field-row"><span class="label">Allergies</span><span class="value" id="r-allergies">—</span></div>
+
+      <div class="section-title">Visit History</div>
+      <div id="r-records"></div>
+
+      <button class="btn" onclick="showFTab('write')" style="margin-top:16px;">+ Write New Record</button>
+    </div>
+  </div>
+
+  <!-- WRITE RECORD -->
+  <div id="ftab-write" class="card hidden">
+    <div class="section-title">Write Health Record</div>
+    <p style="font-size:0.82rem;color:#666;margin-bottom:10px;">Fill in what applies. Scan the patient first to get their ID.</p>
+
+    <label>Doctor Name</label>
+    <input id="w-doctor" type="text" placeholder="Dr. ">
+
+    <label>Diagnosis</label>
+    <textarea id="w-diagnosis" rows="3" placeholder="What the patient is suffering from..."></textarea>
+
+    <label>Medications Given</label>
+    <textarea id="w-meds" rows="2" placeholder="Drug name, dosage..."></textarea>
+
+    <label>HIV Status (leave blank if not applicable)</label>
+    <select id="w-hiv">
+      <option value="">— Not recorded —</option>
+      <option>Negative</option>
+      <option>Positive</option>
+      <option>On ART</option>
+    </select>
+
+    <label>TB Status (leave blank if not applicable)</label>
+    <select id="w-tb">
+      <option value="">— Not recorded —</option>
+      <option>Negative</option>
+      <option>Positive</option>
+      <option>On Treatment</option>
+    </select>
+
+    <label>Other Conditions</label>
+    <input id="w-other" type="text" placeholder="e.g. Hypertension, Diabetes">
+
+    <label>Additional Notes</label>
+    <textarea id="w-notes" rows="2" placeholder="Any other notes..."></textarea>
+
+    <button class="btn" onclick="writeRecord()">Save Record</button>
+    <p class="success hidden" id="w-success">Record saved successfully.</p>
+    <p class="error hidden" id="w-err"></p>
+  </div>
+
+  <button class="btn danger" onclick="facilityLogout()" style="width:95%;max-width:420px;margin:10px auto;display:block;">Logout</button>
+</div>
+
+<script>
+  const API = 'http://localhost:3000/api';
+  let fToken = localStorage.getItem('ftoken');
+  let currentPatientId = null;
+
+  if (fToken) showDashboard(localStorage.getItem('fname'));
+
+  function showDashboard(name) {
+    document.getElementById('facility-login').classList.add('hidden');
+    document.getElementById('facility-dashboard').classList.remove('hidden');
+    document.getElementById('facility-name').textContent = name || '';
+  }
+
+  async function facilityLogin() {
+    const email = document.getElementById('f-email').value.trim();
+    const password = document.getElementById('f-pass').value;
+    try {
+      const res = await fetch(`${API}/auth/facility/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (!res.ok) { document.getElementById('f-err').textContent = data.error; document.getElementById('f-err').classList.remove('hidden'); return; }
+      localStorage.setItem('ftoken', data.token);
+      localStorage.setItem('fname', data.name);
+      fToken = data.token;
+      showDashboard(data.name);
+    } catch (e) {
+      document.getElementById('f-err').textContent = 'Cannot reach server';
+      document.getElementById('f-err').classList.remove('hidden');
+    }
+  }
+
+  async function readPatient() {
+    const code = document.getElementById('scan-code').value.trim().toUpperCase();
+    if (!code) return;
+    try {
+      const res = await fetch(`${API}/facilities/read/${code}`, { headers: { Authorization: `Bearer ${fToken}` } });
+      const data = await res.json();
+      if (!res.ok) { document.getElementById('scan-err').textContent = data.error; document.getElementById('scan-err').classList.remove('hidden'); return; }
+
+      currentPatientId = data.patient_id;
+      document.getElementById('scan-err').classList.add('hidden');
+      document.getElementById('patient-result').classList.remove('hidden');
+
+      if (data.identity) {
+        document.getElementById('r-name').textContent = data.identity.full_name || '—';
+        document.getElementById('r-sid').textContent = data.identity.student_id || '—';
+        document.getElementById('r-dob').textContent = data.identity.date_of_birth ? data.identity.date_of_birth.split('T')[0] : '—';
+        document.getElementById('r-gender').textContent = data.identity.gender || '—';
+        document.getElementById('r-insurance').textContent = data.identity.insurance_id || '—';
+        document.getElementById('identity-section').classList.remove('hidden');
+      } else {
+        document.getElementById('identity-section').classList.add('hidden');
+      }
+
+      document.getElementById('r-blood').textContent = data.health?.blood_type || '—';
+      document.getElementById('r-allergies').textContent = data.health?.allergies || 'None';
+
+      const records = data.records || [];
+      document.getElementById('r-records').innerHTML = records.length ? records.map(r => `
+        <div class="record-card">
+          <div class="date">${r.visit_date ? r.visit_date.split('T')[0] : '—'}</div>
+          <div class="facility">${r.facility_name || '—'}</div>
+          <div class="diagnosis"><strong>Diagnosis:</strong> ${r.diagnosis || '—'}</div>
+          <div class="meds"><strong>Medications:</strong> ${r.medications || '—'}</div>
+          ${r.hiv_status ? `<div class="meds"><strong>HIV:</strong> ${r.hiv_status}</div>` : ''}
+          ${r.tb_status ? `<div class="meds"><strong>TB:</strong> ${r.tb_status}</div>` : ''}
+          ${r.other_conditions ? `<div class="meds"><strong>Other:</strong> ${r.other_conditions}</div>` : ''}
+        </div>
+      `).join('') : '<p style="color:#aaa;font-size:0.85rem;">No records yet.</p>';
+
+    } catch (e) {
+      document.getElementById('scan-err').textContent = 'Error fetching data';
+      document.getElementById('scan-err').classList.remove('hidden');
+    }
+  }
+
+  async function writeRecord() {
+    if (!currentPatientId) { alert('Scan a patient first.'); return; }
+    const body = {
+      patient_id: currentPatientId,
+      doctor_name: document.getElementById('w-doctor').value.trim(),
+      diagnosis: document.getElementById('w-diagnosis').value.trim(),
+      medications: document.getElementById('w-meds').value.trim(),
+      hiv_status: document.getElementById('w-hiv').value,
+      tb_status: document.getElementById('w-tb').value,
+      other_conditions: document.getElementById('w-other').value.trim(),
+      notes: document.getElementById('w-notes').value.trim(),
+    };
+    try {
+      const res = await fetch(`${API}/records/write`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${fToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      if (!res.ok) { document.getElementById('w-err').textContent = data.error; document.getElementById('w-err').classList.remove('hidden'); return; }
+      document.getElementById('w-success').classList.remove('hidden');
+      document.getElementById('w-err').classList.add('hidden');
+    } catch (e) {
+      document.getElementById('w-err').textContent = 'Error saving record';
+      document.getElementById('w-err').classList.remove('hidden');
+    }
+  }
+
+  function showFTab(name) {
+    ['scan','write'].forEach(t => document.getElementById(`ftab-${t}`).classList.toggle('hidden', t !== name));
+    document.querySelectorAll('.tab-bar button').forEach((b, i) => b.classList.toggle('active', ['scan','write'][i] === name));
+  }
+
+  function facilityLogout() {
+    localStorage.removeItem('ftoken');
+    localStorage.removeItem('fname');
+    window.location.reload();
+  }
+</script>
+</body>
+</html>
